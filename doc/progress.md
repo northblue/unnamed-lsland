@@ -47,13 +47,21 @@
 - deploy/island/release.json 记录来源 / 运行链接 / 标签 / 摘要，两个绿联 Compose 已固定不可变 digest，DATABASE_URL 保持空白。新增无密码 / 无存档的绿联配置 ZIP，并更新发布说明和部署计划。
 - 本轮只发布镜像与准备文件，未导入 UGREEN、创建 Web 容器、运行 NAS 迁移、配置端口 / Tunnel、改动 Mac 存档或 NAS 数据。下一阶段仍是逻辑存档导出 / 拒绝覆盖导入及访问保护，不能把镜像可拉取视为已经上线。
 
+### 2026-11-16 NAS 建表 / 健康验收与存档迁移工具
+
+- 用户在 UGREEN 启动 unnamed-island Web；先因 DATABASE_URL 空值 health 503，填写后维护项目 status 确认可连接 unnamed_island、基线未应用。随后 deploy 日志截图确认 20261115000000_initial 全部应用、退出 code 0，Web health 最终截图为 200 / status ok。以上是用户操作证据，助手未直接操作 NAS。未复制含连接凭据的截图到仓库。
+- 新增只读 D1 导出：Node SQLite backup API 先创建一致性副本（包含已提交 WAL），从副本读取并校验共享岛；导出版本化 JSON、完整内容 checksum、SQL 导入 / 只读核对和文件摘要。SQL 仅限 unnamed_island，SET LOCAL ROLE island_app，锁表后拒绝任意非空目标，同一事务插入并核对全状态 / revision / 时间戳，失败不提交，不提供覆盖 / reset 分支。
+- 实际 Mac 导出位于 code/transfers/2026-11-15T13-56-37-254Z：Island of Lucas & Ethan，木材 49 / 石料 16 / 建筑 0，鱼池 1 / 2 / 2 / 0 共 5，revision 688。原 D1 未改变；完整 SQLite 副本保留 Mac，仅迁移所需文件会打包。transfers 已排除 Git / Docker，存档不推送到仓库或 CI。
+- 本地 78 项测试通过（67 游戏 + 11 服务端），新增 WAL 备份 / 源文件和 WAL 不变 / 全字段时间戳 / 篡改拒绝 / 不覆盖 / 权限 / 多数据库歧义测试。新 CI 工作流已编写，用合成存档在普通角色 PostgreSQL 测导入 / 重放拒绝 / 错库 / 校验失败回滚 / 只读漂移发现，以及已发布 Web 读回与重启；最终运行结果后续记录。未改网页或发布镜像，不额外重建 Next。
+- 实际 NAS 旧岛导入尚未执行，目标是否为空未检查；继续前用户须停止 Web、做一次建表后的新备份，再上传可信导出包。入口 / Access / APP_ORIGIN 与实际存档备份恢复仍待实施，见 island-save-migration.md。
+
 ## 当前状态
 
 | 项目 | 实现情况 |
 | --- | --- |
 | 技术与名称 | 无名岛 / Unnamed Island，unnamed-island；Next.js + JavaScript + Three.js，应用位于 code/ |
 | NAS 共享 PostgreSQL | 用户截图确认 PostgreSQL 17.12、两项目库及所属账号、Mind Friend 的 vector 0.8.7 和 mind_app TCP 密码登录；跨库拒绝已由截图 / 用户反馈核对；首次挂载目录备份和同实例临时库恢复演练成功；业务数据迁移后的核对 / 完整重启回归待验证；小岛默认 D1 / SQLite，已增加可选 PostgreSQL 客户端与独立基线，未接 NAS |
-| 镜像发布 | GHCR Web / tools 已通过 CI 验收并发布，绿联模板固定 digest；尚未在 NAS 运行 Web 或迁移旧岛 |
+| 镜像发布 | GHCR Web / tools 已通过 CI 验收并发布，绿联模板固定 digest；NAS Web 启动 / 迁移 / health 200 已由用户截图确认；旧岛导入待执行 |
 | 本地数据库 | Prisma + Wrangler 模拟 D1（SQLite）；0001 / 0002 / 0003 增量迁移已应用 |
 | 探索 / 采集 / 建造 | 已实现；最新陆地半轴 20×15.5、外海半径 33，新增高地 / 山丘 / 沙丘 / 礁石，推荐空地及坡度校验 |
 | 存档 / 管理 | 岛名、材料、耗尽资源 / 树木生长进度、角色位置、建筑、鱼篓和鱼池自动保存；岛名 / 木石 / 建筑可在管理界面修改 |

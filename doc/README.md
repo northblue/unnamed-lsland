@@ -10,6 +10,7 @@
 | [共享 PostgreSQL 图形界面部署](../deploy/postgres/README.md) | UGREEN Compose、独立项目库 / 账号、备份与验证状态 |
 | [独立 NAS PostgreSQL 项目文档](../../nas-postgres/doc/README.md) | 共享数据库的部署、存储、安全、备份恢复与脚本；位于相邻独立项目 |
 | [小岛 PostgreSQL 适配](postgresql-app-adapter.md) | 双数据库模式、基线迁移与当前验证边界 |
+| [Mac → NAS 存档迁移](island-save-migration.md) | 只读导出、完整本地备份、拒绝覆盖的 SQL 导入与核对 |
 | [小岛独立容器与镜像发布](nas-island-container.md) | Dockerfile、GHCR 手动发布、绿联独立项目与未验证步骤 |
 | [无名岛 NAS 首次部署计划](unnamed-island-nas-plan.md) | 当前代码差距、现有存档迁移、Compose / Tunnel 分阶段落地 |
 | [NAS 发布规范建议稿](nas-deployment-standard.md) | Mac → CI 镜像 → UGREEN Compose / Tunnel，应用与模型服务分开；尚未落地 |
@@ -35,7 +36,7 @@
 | 存档与管理 | 本地 D1 自动保存岛名、材料、资源点、玩家位置、建筑、鱼篓和鱼池；管理面板可改岛名、材料与建筑 |
 | 界面 | 中文 / English，镜头旋转、缩放、俯视 / 斜俯视 / 侧视，窄屏面板折叠 |
 
-本地当前仍采用 Wrangler 模拟 D1（底层 SQLite）；用户已选择 NAS 共享 PostgreSQL 作为部署方向，各项目独立库 / 账号。NAS PostgreSQL 17.12 已由用户日志确认正常启动，两项目库 / 所属账号及 vector 0.8.7 已查询确认，mind_app 登录和隔离检查已有验证记录，首次备份与同实例临时库恢复演练已通过，真实业务数据迁移尚未实施；小岛已有可选 PostgreSQL 接入与独立迁移文件，尚未连接 NAS 或迁移存档。当前未实现用户认证、真实生产库、生产部署或一键重置。离线试玩不保存；昼夜速度、预览和声音开关是会话设置，语言偏好单独保存在浏览器。
+本地当前仍采用 Wrangler 模拟 D1（底层 SQLite）；用户已选择 NAS 共享 PostgreSQL 作为部署方向，各项目独立库 / 账号。NAS PostgreSQL 17.12 已由用户日志确认正常启动，两项目库 / 所属账号及 vector 0.8.7 已查询确认，mind_app 登录和隔离检查已有验证记录，首次备份与同实例临时库恢复演练已通过，真实业务数据迁移尚未实施；小岛 Web 已在 NAS 运行，用户截图确认建表迁移成功、health 200；Mac 旧岛已只读导出，实际存档导入仍待执行。当前未实现用户认证、真实生产库、生产部署或一键重置。离线试玩不保存；昼夜速度、预览和声音开关是会话设置，语言偏好单独保存在浏览器。
 
 最近功能改动的记录为 67 项测试和 Next.js 构建通过；这不代表完成了跨设备性能、音质或生产验证。具体范围见开发进度。当前操作仍以桌面键鼠为主，窄屏排版不代表已有完整手机触控控制。
 

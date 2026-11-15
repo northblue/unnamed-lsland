@@ -9,3 +9,4 @@ src/generated/
 .dev.vars*
 *.db
 *.db-*
+transfers/

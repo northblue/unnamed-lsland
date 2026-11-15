@@ -1,6 +1,6 @@
 # 小岛独立容器与镜像发布
 
-更新：2026-11-16。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；已由 Actions 43716616878 发布 Web / tools 镜像，摘要与 linux/amd64 架构及匿名拉取已核对；尚未更改 NAS。
+更新：2026-11-16。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；已由 Actions 43716616878 发布 Web / tools 镜像，摘要与 linux/amd64 架构及匿名拉取已核对；用户随后已在 NAS 启动 Web / tools，完成基线迁移且 health 200；旧岛导入和浏览器入口尚未完成。
 
 ## 当前已发布版本
 

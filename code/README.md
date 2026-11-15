@@ -67,3 +67,7 @@ PostgreSQL 的建表文件在 `prisma/postgresql/migrations/`；未来核对目�
 详见 [PostgreSQL 适配说明](../doc/postgresql-app-adapter.md)、[独立容器与镜像发布](../doc/nas-island-container.md) 和 [NAS 计划](../doc/unnamed-island-nas-plan.md)。原 `wrangler.jsonc` / OpenNext 仍保留 D1 开发与预览能力，真实生产 D1 未创建；NAS 是当前选定的发布方向。不要复用其他项目的库、账号或存档。
 
 Docker 构建上下文为 code/，Dockerfile 的 web / tools 分别对应应用和显式迁移维护镜像。`ISLAND_STANDALONE=1` 启用 standalone；普通 D1 开发不启用。`/api/health` 只读查询 Island 表，数据库不可用或未建表返回 503，不初始化岛屿。现有 localhost API 限制保留，当前 Compose 没有公开端口或 Tunnel，不能直接作为公开上线配置。
+
+## 现有存档导出
+
+`npm run save:export` 使用只读 SQLite backup API 导出当前 D1 岛屿到被 Git / Docker 排除的 transfers/。完整 SQLite 副本保留本机，JSON / SQL 导入包含 checksum、事务和目标非空拒绝保护，不需要升级 NAS 镜像。步骤见 [Mac → NAS 存档迁移](../doc/island-save-migration.md)。

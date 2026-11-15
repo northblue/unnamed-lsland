@@ -1,0 +1,92 @@
+name: Verify D1 to PostgreSQL save transfer
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  transfer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Test snapshot and transfer validation
+        run: node --test code/src/lib/saveTransfer.test.js
+      - name: Prepare synthetic WAL save
+        run: node code/scripts/transfer-fixture.mjs "$RUNNER_TEMP/save-transfer"
+      - name: Verify PostgreSQL import, replay refusal and rollback
+        run: |
+          set -euo pipefail
+          docker network create island-transfer-ci
+          docker run -d --name island-transfer-db --network island-transfer-ci \
+            -e POSTGRES_USER=nas_admin -e POSTGRES_PASSWORD=ci-admin-only postgres:17-bookworm
+          ready=false
+          for attempt in $(seq 1 40); do
+            if docker exec island-transfer-db pg_isready -h 127.0.0.1 -U nas_admin -d postgres; then ready=true; break; fi
+            sleep 2
+          done
+          test "$ready" = true
+          docker exec island-transfer-db psql -X -U nas_admin -d postgres -v ON_ERROR_STOP=1 \
+            -c "CREATE ROLE island_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD 'ci-app-only';"
+          docker exec island-transfer-db createdb -U nas_admin -O island_app unnamed_island
+          docker exec -i island-transfer-db psql -X -U nas_admin -d unnamed_island -v ON_ERROR_STOP=1 \
+            -c 'SET ROLE island_app' -f - < code/prisma/postgresql/migrations/20261115000000_initial/migration.sql
+          if docker exec -i island-transfer-db psql -X -U nas_admin -d postgres \
+            < "$RUNNER_TEMP/save-transfer/transfer/island-import.sql"; then
+            echo 'ERROR: wrong database was accepted'; exit 1
+          fi
+          if docker exec -i island-transfer-db psql -X -U nas_admin -d unnamed_island \
+            < "$RUNNER_TEMP/save-transfer/bad-import.sql"; then
+            echo 'ERROR: verification failure was accepted'; exit 1
+          fi
+          count=$(docker exec island-transfer-db psql -X -U nas_admin -d unnamed_island -Atc 'SELECT count(*) FROM "Island"')
+          test "$count" = 0
+          docker exec -i island-transfer-db psql -X -U nas_admin -d unnamed_island \
+            < "$RUNNER_TEMP/save-transfer/transfer/island-import.sql"
+          docker exec -i island-transfer-db psql -X -U nas_admin -d unnamed_island \
+            < "$RUNNER_TEMP/save-transfer/transfer/island-verify.sql"
+          if docker exec -i island-transfer-db psql -X -U nas_admin -d unnamed_island \
+            < "$RUNNER_TEMP/save-transfer/transfer/island-import.sql"; then
+            echo 'ERROR: replay overwrote an existing island'; exit 1
+          fi
+          docker exec -i island-transfer-db psql -X -U nas_admin -d unnamed_island \
+            < "$RUNNER_TEMP/save-transfer/transfer/island-verify.sql"
+      - name: Verify imported save in the published Web image and after restart
+        run: |
+          set -euo pipefail
+          image=$(node -p "JSON.parse(require('fs').readFileSync('deploy/island/release.json')).web.image")
+          docker run -d --name island-transfer-web --network island-transfer-ci \
+            -p 127.0.0.1:3000:3000 \
+            -e DATABASE_URL=postgresql://island_app:ci-app-only@island-transfer-db:5432/unnamed_island "$image"
+          wait_for_web() {
+            for attempt in $(seq 1 40); do
+              if curl --fail --silent http://localhost:3000/api/health; then return 0; fi
+              sleep 2
+            done
+            return 1
+          }
+          wait_for_web
+          node code/scripts/verify-transfer-api.mjs "$RUNNER_TEMP/save-transfer/transfer/island-save.json"
+          docker restart island-transfer-web
+          wait_for_web
+          node code/scripts/verify-transfer-api.mjs "$RUNNER_TEMP/save-transfer/transfer/island-save.json"
+          docker exec island-transfer-db psql -X -U nas_admin -d unnamed_island -c 'UPDATE "Island" SET wood = wood + 1'
+          if docker exec -i island-transfer-db psql -X -U nas_admin -d unnamed_island \
+            < "$RUNNER_TEMP/save-transfer/transfer/island-verify.sql"; then
+            echo 'ERROR: read-only check missed state drift'; exit 1
+          fi
+          count=$(docker exec island-transfer-db psql -X -U nas_admin -d unnamed_island -Atc 'SELECT wood FROM "Island"')
+          test "$count" = 124
+      - name: Logs and cleanup
+        if: always()
+        run: |
+          docker logs island-transfer-web 2>&1 || true
+          docker logs island-transfer-db 2>&1 || true
+          docker rm -f island-transfer-web island-transfer-db || true
+          docker network rm island-transfer-ci || true

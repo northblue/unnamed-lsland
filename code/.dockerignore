@@ -9,6 +9,7 @@ node_modules
 **/.dev.vars*
 src/generated
 assets
+transfers
 *.log
 *.db
 *.db-*

@@ -6,7 +6,7 @@
 
 - 名称：无名岛 / Unnamed Island；包名 `unnamed-island`。
 - 技术：Next.js App Router + JavaScript + Three.js，应用在 `code/`。
-- 当前数据库实现：Prisma + D1，本地由 Wrangler 模拟 SQLite。已选择 NAS 共享 PostgreSQL，各项目独立数据库 / 账号，复用现有 Tunnel。UGREEN 用户日志确认 PostgreSQL 17.12 服务已启动，两个项目库 / 所属角色、vector 0.8.7 及 mind_app TCP 登录已确认；隔离已有截图 / 用户检查反馈，第一次逻辑备份与当前空库的非覆盖恢复演练成功，真实业务数据 / 完整重启回归待验证，小岛已加入可选 PostgreSQL 接入和独立基线迁移，CI 临时 PostgreSQL 读写 / 冲突 / 重启验收已通过，GHCR Web / tools 镜像已发布；NAS 应用接入与实际存档迁移未实施，见 [共享数据库部署](../deploy/postgres/README.md)。
+- 当前数据库实现：Prisma + D1，本地由 Wrangler 模拟 SQLite。已选择 NAS 共享 PostgreSQL，各项目独立数据库 / 账号，复用现有 Tunnel。UGREEN 用户日志确认 PostgreSQL 17.12 服务已启动，两个项目库 / 所属角色、vector 0.8.7 及 mind_app TCP 登录已确认；隔离已有截图 / 用户检查反馈，第一次逻辑备份与当前空库的非覆盖恢复演练成功，真实业务数据 / 完整重启回归待验证，小岛已加入可选 PostgreSQL 接入和独立基线迁移，CI 临时 PostgreSQL 读写 / 冲突 / 重启验收已通过，GHCR Web / tools 镜像已发布；NAS 已由用户完成应用启动 / 基线迁移且 health 200，Mac 旧岛实际导入仍待执行，见 [共享数据库部署](../deploy/postgres/README.md)。
 - 体验：明亮柔和的微缩海岛，单人桌面键鼠优先，逐步学习和实现；当前没有饥饿死亡、战斗或其他惩罚机制。
 - 核心循环：探索 → 采集 → 建造 → 保存；钓鱼与自然景观作为已确认的扩展内容。
 
