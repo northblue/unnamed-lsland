@@ -8,6 +8,10 @@ assert.ok(snapshot, 'Run only in the isolated GitHub Actions smoke check');
 const response = await fetch(`${base}/api/island`);
 assert.equal(response.status, 200);
 const save = await response.json();
+const denied = await fetch(`${base}/api/island`, {
+  headers: { Host: 'public.example.com', 'X-Forwarded-Host': 'localhost:3000' },
+});
+assert.equal(denied.status, 403, 'Forwarded headers must not bypass the local host restriction');
 if (process.argv.includes('--saved')) {
   const previous = JSON.parse(readFileSync(snapshot, 'utf8'));
   assert.deepEqual(save.state, previous.state, 'State changed across container restart');

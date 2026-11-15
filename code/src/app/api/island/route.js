@@ -1,16 +1,11 @@
 import { getPrisma } from '../../../lib/prisma';
 import { createIslandState, validateIslandState } from '../../../game/islandState';
+import { checkLocalRequest } from '../../../lib/localRequest';
 
 export const runtime = 'nodejs';
 const ISLAND_ID = 'local-island';
 const headers = { 'Cache-Control': 'no-store' };
 
-function checkLocal(request, write = false) {
-  const url = new URL(request.url);
-  if (!['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) return false;
-  if (write && request.headers.get('origin') !== url.origin) return false;
-  return true;
-}
 function response(record) {
   return { revision: record.revision, updatedAt: record.updatedAt,
     state: validateIslandState({ version: 1, name: record.name, wood: record.wood, stone: record.stone, catches: record.catches, pond: record.pond,
@@ -19,7 +14,7 @@ function response(record) {
 }
 
 export async function GET(request) {
-  if (!checkLocal(request)) return Response.json({ error: 'localOnly' }, { status: 403, headers });
+  if (!checkLocalRequest(request)) return Response.json({ error: 'localOnly' }, { status: 403, headers });
   try {
     const prisma = getPrisma();
     const initial = createIslandState();
@@ -41,7 +36,7 @@ export async function GET(request) {
 }
 
 export async function PUT(request) {
-  if (!checkLocal(request, true)) return Response.json({ error: 'localOnly' }, { status: 403, headers });
+  if (!checkLocalRequest(request, true)) return Response.json({ error: 'localOnly' }, { status: 403, headers });
   let state;
   let revision;
   try {

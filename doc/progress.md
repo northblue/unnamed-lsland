@@ -26,6 +26,12 @@
 - 提交候选 219 个文件，约 23.5 MB；检查排除 node_modules、.next、.wrangler、本地数据库、真实 .env / .dev.vars、生成客户端与日志，并检查常见私钥 / GitHub token 标记；部署 ZIP 内不含真实 .env 或数据库归档。没有改游戏逻辑或 NAS 数据。
 - 使用上轮已通过的 71 项测试、standalone 构建 / 隔离 HTTP 和 YAML 检查，本轮仅 Git 整理 / 文档不重复运行应用测试。首次提交 42537de 已成功推送 origin/main 并建立跟踪；Actions 仍为手动触发，提交不会自动发布镜像或更新 NAS。后续文档状态同步另作小提交。
 
+### 2026-11-15 首次云端构建与容器访问校验修复
+
+- 用户要求继续后，以 publish=false 启动 Actions 43714880308。Linux Web / tools 镜像已实际构建成功，构建中的测试通过；临时 PostgreSQL 17.12 成功应用基线，health 返回 200。但存档检查失败（403），不能记为整体验收通过，镜像未发布。
+- 原因：Next standalone 在绑定 0.0.0.0 的容器中重建 request.url 时使用监听地址，旧 localhost 校验错误拒绝带真实 Host: localhost 的请求。改用经过严格 localhost / 127.0.0.1 / [::1] 白名单校验的 HTTP Host，写入仍要求协议和端口均一致的 Origin；不信任 X-Forwarded-Host，不放开公网 / 域名访问，也不把 Host 校验当身份认证。
+- 新增四项本地请求测试（8 项服务端测试通过），CI smoke 加入公网 Host + 伪造 forwarded 头仍被拒绝的验收。修复后重新跑 CI，最终结果另记录；未访问 NAS。
+
 ## 当前状态
 
 | 项目 | 实现情况 |
