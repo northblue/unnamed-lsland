@@ -1,6 +1,6 @@
 # 小岛独立容器与镜像发布
 
-更新：2026-11-15。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已运行第一次仅验证 Actions：Linux 镜像 / 迁移通过，因本地 Host 校验导致存档 403 而失败，正在修复重验；尚未发布镜像或更改 NAS。
+更新：2026-11-15。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；尚未发布镜像或更改 NAS。
 
 ## 文件与边界
 
@@ -36,8 +36,8 @@
 
 ## 验证记录
 
-本机没有 Docker；第一次 GitHub Actions 已成功构建 Linux Web / tools 镜像并应用临时 PostgreSQL 迁移，但存档 403 导致整体验收失败，不能发布。修复后的运行结果见开发进度。已在 Mac 生成 standalone，复制到项目之外的临时目录并补 public / .next/static，验证 HTML、浏览器 JS、鱼 / 鸟 GLB 可访问；PostgreSQL 指向本机关闭端口时，API / health 返回 503，日志是数据库不可达而不是缺模块。临时服务已停止。
+本机没有 Docker；第三次 [GitHub Actions 43716023910](https://github.com/northblue/unnamed-lsland/actions/runs/43716023910) 已全部通过，验收提交 22ccece：Linux Web / tools 镜像构建、75 项测试、临时 PostgreSQL 迁移、health、页面 / JS / 鱼鸟 GLB、存档读写 / 校验 / Origin / revision 并发及 Web 重启后的状态比对。publish=false，未发布到 GHCR。已在 Mac 生成 standalone，复制到项目之外的临时目录并补 public / .next/static，验证 HTML、浏览器 JS、鱼 / 鸟 GLB 可访问；PostgreSQL 指向本机关闭端口时，API / health 返回 503，日志是数据库不可达而不是缺模块。临时服务已停止。
 
-这只能验证本地 standalone 产物；不能代替 Linux npm ci、Debian 引擎、Docker 权限 / 健康状态或 PostgreSQL 实例读写验收。CI 已实际暴露并定位容器监听地址与 HTTP Host 的差异；修复后须完整重验通过，才能宣称存档 / 重启已验证。Compose / workflow 已做 YAML 与结构检查，未在 UGREEN 导入本轮配置。
+本地检查不代替 Linux 验收；上述 Linux / PostgreSQL 步骤已由 CI 补充通过。早期两次失败分别来自容器监听地址与 HTTP Host 的差异、Node fetch 移除测试指定 Host；修复和原始 HTTP 安全检查均已重验。当前还未验证 NAS 受限角色下的应用迁移、真实存档 / 备份恢复、生产资源限制和家庭访问保护。Compose / workflow 已做 YAML 与结构检查，未在 UGREEN 导入本轮配置。
 
 实现依据：[Next standalone 输出](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)、[Docker GitHub Actions](https://docs.docker.com/build/ci/github-actions/)、[GitHub GHCR 发布](https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images)。

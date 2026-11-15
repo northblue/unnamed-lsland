@@ -62,7 +62,7 @@ Prisma schema 在 `prisma/schema.prisma`；D1 SQL 迁移在 `migrations/`，由 
 
 默认 Mac 开发和原 D1 存档保持不变。设置 `ISLAND_DATABASE_PROVIDER=postgresql` 和服务端 `DATABASE_URL` 后使用独立 PostgreSQL 客户端、每进程最多 5 个连接。只填写 URL 不会自动切换；切换模式不导入数据。`npm run db:generate` / `db:validate` 同时处理两份 schema。
 
-PostgreSQL 的建表文件在 `prisma/postgresql/migrations/`；未来核对目标后用 `npm run db:pg:status` / `db:pg:deploy`。当前没有在 PostgreSQL 实例执行迁移或读写；API 仍限定 localhost，Access / Origin / 镜像及逻辑存档迁移尚待完成，不能直接开放公网。首版按自己 / 家人共用一座岛实施，User / GameSave 仍是未接入的模型。
+PostgreSQL 的建表文件在 `prisma/postgresql/migrations/`；未来核对目标后用 `npm run db:pg:status` / `db:pg:deploy`。已在 CI 临时 PostgreSQL 17.12 通过迁移、读写 / 冲突 / 重启检查，尚未操作 NAS 应用库或导入现有岛屿；API 仍限定 localhost，Access / Origin / 镜像及逻辑存档迁移尚待完成，不能直接开放公网。首版按自己 / 家人共用一座岛实施，User / GameSave 仍是未接入的模型。
 
 详见 [PostgreSQL 适配说明](../doc/postgresql-app-adapter.md)、[独立容器与镜像发布](../doc/nas-island-container.md) 和 [NAS 计划](../doc/unnamed-island-nas-plan.md)。原 `wrangler.jsonc` / OpenNext 仍保留 D1 开发与预览能力，真实生产 D1 未创建；NAS 是当前选定的发布方向。不要复用其他项目的库、账号或存档。
 

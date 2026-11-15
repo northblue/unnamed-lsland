@@ -42,7 +42,7 @@ DATABASE_URL=postgresql://unused@127.0.0.1:1/schema_diff npx prisma migrate diff
 
 ## 验收边界与下一步
 
-已验证双 schema 校验与生成、配置选择和字段一致性测试、部署缺少 URL 时拒绝、67 项游戏规则回归、D1 / PostgreSQL 两种构建；临时开发服务器只读 GET 成功加载原 D1 岛屿，随后关闭服务。实际 PostgreSQL 建表、JSON / 日期读写、并发保存与连接池回收未验证；本机没有 PostgreSQL / Docker 服务，本轮不访问 NAS 数据库。
+已验证双 schema 校验与生成、配置选择和字段一致性测试、部署缺少 URL 时拒绝、67 项游戏规则回归、D1 / PostgreSQL 两种构建；临时开发服务器只读 GET 成功加载原 D1 岛屿，随后关闭服务。后续 Actions 43716023910 已在临时 PostgreSQL 17.12 验证建表、JSON 存档读写、revision 并发及 Web 重启后的状态比对，见容器发布说明；NAS 实际应用账号 / 现有岛屿迁移、连接池回收及备份恢复仍未验收。本机没有 PostgreSQL / Docker 服务，未访问 NAS 数据库。
 
 当前 API 仍限定 localhost，不是可直接对外发布的 NAS 版本。后续依次做逻辑存档导出 / 拒绝覆盖的导入工具、独立 PostgreSQL 真机读写验收、APP_ORIGIN / 家庭 Access 权限、镜像和 UGREEN 应用 Compose，最后切换存档与 Tunnel。切换数据库不会自动搬迁岛屿，也不会同步 Mac 与 NAS 的进度。
 

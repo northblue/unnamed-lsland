@@ -32,6 +32,13 @@
 - 原因：Next standalone 在绑定 0.0.0.0 的容器中重建 request.url 时使用监听地址，旧 localhost 校验错误拒绝带真实 Host: localhost 的请求。改用经过严格 localhost / 127.0.0.1 / [::1] 白名单校验的 HTTP Host，写入仍要求协议和端口均一致的 Origin；不信任 X-Forwarded-Host，不放开公网 / 域名访问，也不把 Host 校验当身份认证。
 - 新增四项本地请求测试（8 项服务端测试通过），CI smoke 加入公网 Host + 伪造 forwarded 头仍被拒绝的验收。第二次 CI 43715643137 的正常本地 GET 已成功，但安全 smoke 使用 Node fetch 设置 Host；该客户端会删除自定义 Host，导致测试实际仍发 localhost，预期 403 却得到 200。已核对 Undici 实现，改为 node:http 原始请求真实发送 Host，再完整重验；最终结果另记录，未访问 NAS。
 
+### 2026-11-15 Linux 镜像与 PostgreSQL 云端验收通过
+
+- Actions [43716023910](https://github.com/northblue/unnamed-lsland/actions/runs/43716023910) 对提交 22ccece8a56bf29861fc80830140283199cc4fa8 完成，结论 success；publish=false，GHCR 登录 / 发布步骤跳过，未启动或修改 NAS。
+- 实际构建 linux/amd64 Web / tools 镜像，75 项测试（67 游戏 + 8 服务端）通过；一次性 PostgreSQL 17.12 应用基线成功，health 正常。真实 HTTP 校验了页面、JS、鱼 / 鸟 GLB、伪造 Host / forwarded 头拒绝；存档脚本验证名字 / 资源 / 建筑 / 鱼篓 / 鱼池读写、非法数据与跨 Origin 拒绝、旧 revision / 并发保存冲突，并还原测试初始状态。Web 容器重启后，状态与保存的初始快照比对通过；CI 容器 / 网络已清理。
+- 首次运行 43714880308 因容器 request.url 的 0.0.0.0 导致合法本地 GET 403，已修复。第二次 43715643137 的安全测试因 Node fetch 移除自定义 Host 而错误发出 localhost，改用 node:http 后完整重验成功。未通过删除本地或 Origin 校验来绕过问题。
+- 当前只完成临时 CI 数据库的验收，不是 NAS 受限角色 / 实际存档迁移 / 容量 / 备份恢复或 Access 权限验收。NAS 应用 Compose 不公开端口，入口认证、APP_ORIGIN 与旧岛导出 / 拒绝覆盖导入仍待实施。镜像只在 CI runner 构建，未推送注册表；下一步按用户选择发布已验证版本并继续迁移准备。
+
 ## 当前状态
 
 | 项目 | 实现情况 |
