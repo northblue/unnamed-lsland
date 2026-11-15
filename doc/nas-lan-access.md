@@ -2,7 +2,7 @@
 
 更新：2026-11-16。用户网络截图确认 NAS LAN1 的 IPv4 为 192.168.4.82（DHCP）。目标地址为 `http://192.168.4.82:3080`，只供同一局域网的家庭共享岛试玩，不需要 Cloudflare Tunnel / 公网域名。
 
-旧配置没有 ports，所以浏览器曾显示 ERR_CONNECTION_REFUSED；旧镜像还只允许 localhost 存档 API。需要同时升级到支持 APP_ORIGIN 的新镜像、配置 Origin 和发布端口，不能只改其中一项。版本 / 发布结果见开发进度，未成功发布前不要把旧镜像当新版本使用。
+旧配置没有 ports，所以浏览器曾显示 ERR_CONNECTION_REFUSED；旧镜像还只允许 localhost 存档 API。需要同时升级到支持 APP_ORIGIN 的新镜像、配置 Origin 和发布端口，不能只改其中一项。[Actions 43722484386](https://github.com/northblue/unnamed-lsland/actions/runs/43722484386) 对提交 440addd 验收并发布成功；当前 [release.json](../deploy/island/release.json) 和 [局域网 Compose](../deploy/island/compose.lan.ugreen.yaml) 已固定新镜像摘要，旧镜像不支持该配置。
 
 ## 应用行为
 
@@ -34,4 +34,4 @@ NAS 当前用 DHCP；地址以后变化时，APP_ORIGIN、ports 的绑定 IP 和
 
 本地测试覆盖显式 LAN Host、端口 / 协议 / Origin 错配、缺失 Origin、伪造 forwarded 头，以及非法 / 公网 APP_ORIGIN。云端镜像工作流会用原始 HTTP 发送真实 Host，测试局域网语义的 GET / PUT 和旧版本冲突；这些请求只连 CI localhost，192.168.4.82 是 HTTP 头测试值，不连接用户 NAS。
 
-发布和 CI 结论按开发进度记录；实际 NAS 页面打开、保存 / 刷新以及多设备表现仍需要用户现场验收。错误提示已集中更新中文 / English。
+81 项测试及上述原始 HTTP LAN 保存 / 拒绝 / 冲突检查已通过，镜像发布成功，摘要 / linux/amd64 / 匿名拉取也已实际核对。实际 NAS 页面打开、保存 / 刷新以及多设备表现仍需要用户现场验收，助手未修改 NAS。错误提示已集中更新中文 / English。

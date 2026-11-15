@@ -63,6 +63,14 @@
 - 新 requestAccess：默认仍 localhost；APP_ORIGIN 仅限显式私有 LAN IP / loopback origin，严格匹配 Host 与写入 Origin 的协议 / 端口，不信任 forwarded 头；保留校验、revision 和 loopback 运维请求。新增中英提示、三项访问规则测试及原始 HTTP LAN 保存 / 拒绝 / 冲突 CI 步骤。本地 81 项测试通过（67 游戏 + 14 服务端），新版镜像 CI / 发布结果稍后记录。
 - 局域网浏览器入口需在旧岛导入成功后再启用，避免默认空岛占用目标；真实 NAS 配置、存档导入和页面保存尚未由助手执行，步骤见 nas-lan-access.md。
 
+### 2026-11-16 局域网版本发布与配置包完成
+
+- [Actions 43722484386](https://github.com/northblue/unnamed-lsland/actions/runs/43722484386) 对提交 440adddf4118aad19d7211796664d8e1c68dfaf0 完整构建 / 81 项测试 / PostgreSQL 保存与重启 / 原始 HTTP LAN GET 与 PUT、跨 Origin / 错 Host 拒绝和旧 revision 冲突检查通过；Web / tools 镜像发布成功。
+- Web 摘要 sha256:c19433c25516619acaa9e4ee22645d2eb81330c87d3dee1d94a7387db6b6f74e，tools sha256:67c3ced8ecb3400b9f1a785db8ae2440fb53037dc03d4572aede247e4017992e；匿名读取 manifest 并重新计算摘要、读取 linux/amd64 config 均匹配。release.json / 两个原模板更新摘要，旧版本信息保留 releases/9c7f0c5.json。
+- 新增 compose.lan.ugreen.yaml，APP_ORIGIN 为用户截图确认的 http://192.168.4.82:3080，ports 只绑定该 IPv4 的 3080 → 容器 3000。DATABASE_URL 保持空模板，用户更新现有项目时保留 NAS 私密值；没有修改任何 NAS 项目或密码。局域网版本不提供独立登录 / 公网入口。
+- 更新无密码配置 ZIP，内含基础 / LAN / tools 三份模板及发布记录和说明，不含真实存档。旧岛逻辑迁移 ZIP 仍仅在被 Git / Docker 排除的 Mac transfers/ 中；必须先停止 Web、备份、导入和只读核对，再更新 Web / 启用浏览器入口，防止默认空岛占用目标。
+- 当前代码 / 镜像和迁移工具已完成验证；真实 NAS 导入结果、更新后局域网页面 / 保存 / 刷新 / 重启验收等待用户操作。未扩大到 Tunnel / Access、每人存档或其他玩法。
+
 ## 当前状态
 
 | 项目 | 实现情况 |

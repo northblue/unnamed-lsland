@@ -1,0 +1,43 @@
+# Published image pinned by digest; source commit 440addd.
+# Update the EXISTING Web project after save import; preserve its private DATABASE_URL.
+version: '3.8'
+services:
+  web:
+    image: ghcr.io/northblue/unnamed-island@sha256:c19433c25516619acaa9e4ee22645d2eb81330c87d3dee1d94a7387db6b6f74e
+    platform: linux/amd64
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    environment:
+      NODE_ENV: production
+      ISLAND_DATABASE_PROVIDER: postgresql
+      DATABASE_URL: ''
+      APP_ORIGIN: 'http://192.168.4.82:3080'
+      PORT: '3000'
+      HOSTNAME: 0.0.0.0
+    # Enable after importing the existing save. Bind only this NAS LAN IPv4.
+    ports:
+      - '192.168.4.82:3080:3000'
+    networks:
+      data: {}
+      app:
+        aliases:
+          - island-web
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+networks:
+  data:
+    external: true
+    name: nas-postgres-data
+  app: {}

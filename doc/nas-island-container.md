@@ -4,11 +4,11 @@
 
 ## 当前已发布版本
 
-- 来源提交：`9c7f0c5c8e1846957ae3e3417915714fdfab4e39`。
-- 发布验收：[Actions 43716616878](https://github.com/northblue/unnamed-lsland/actions/runs/43716616878)，publish=true，构建 / 数据库验收 / 两次镜像上传均成功。
+- 来源提交：`440adddf4118aad19d7211796664d8e1c68dfaf0`（新增显式 LAN Origin）。
+- 发布验收：[Actions 43722484386](https://github.com/northblue/unnamed-lsland/actions/runs/43722484386)，publish=true，81 项测试、数据库 / LAN 访问验收与两次镜像上传均成功；首次发布 43716616878 留作历史。
 - Web 与 tools 的完整 SHA 标签和不可变摘要见 [release.json](../deploy/island/release.json)。两份 Compose 已固定该摘要，不再含镜像占位值；DATABASE_URL 仍为空，由用户在 NAS 私下填写。
 - 两个镜像的 manifest 摘要与 push 日志一致，config 均为 linux/amd64；无凭据匿名拉取验证成功，当前绿联不需要 GHCR 令牌。仅做了发布与拉取可用性验证，没有在 NAS 上运行。
-- [绿联配置包](../deploy/unnamed-island-nas.zip) 含两份 Compose、release.json 与操作说明，无密码、数据库或本地存档。先导入保存，不立即启动，后续先完成逻辑存档迁移工具和访问保护。
+- [绿联配置包](../deploy/unnamed-island-nas.zip) 含基础 / LAN / tools 三份 Compose、release.json 与操作说明，无密码、数据库或本地存档。先完成旧岛导入，再更新现有 Web 的镜像 / APP_ORIGIN / 3080 端口；不要用空模板覆盖私密 DATABASE_URL。局域网步骤见 nas-lan-access.md。
 
 ## 文件与边界
 
@@ -36,11 +36,11 @@
 1. 当前 image 已固定发布成功的 digest；首次无需替换。以后更新使用新版本已验证的 digest，不用 latest。
 2. 在 NAS 私下填 DATABASE_URL：postgresql://island_app:URL编码后的密码@nas-postgres:5432/unnamed_island。这里仅使用 island_app，不是管理员账号。
 3. 核实 nas-postgres-data 已存在；不要新建另一个 PostgreSQL 服务。检查镜像拉取授权。
-4. **当前模板未映射宿主机端口、没有 Tunnel 路由，API 仍仅允许 localhost。** 健康检查只证明数据库表可查询，不代表存档已迁移、认证完成或公网可用。缺 URL / 服务不可达 / 尚未建表时健康接口返回 503。
+4. **基础模板未映射宿主端口，APP_ORIGIN 未设置时仍仅 localhost；局域网模板另行映射 192.168.4.82:3080 并严格允许该 Origin，没有 Tunnel 路由。** 健康检查只证明数据库表可查询，不代表存档已迁移、认证完成或公网可用。缺 URL / 服务不可达 / 尚未建表时健康接口返回 503。
 
 维护项目可先以 status 命令运行并看日志，完成后退出属于正常行为。确认数据库备份、目标库与导入计划后，才将 command 最后一项 status 改为 deploy，显式运行迁移；不是本轮授权自动执行的 NAS 动作。迁移工具不导入旧岛。不要反复让 Web 启动过程自动执行建表。
 
-之后仍需：逻辑存档导出 / 拒绝覆盖导入、PostgreSQL 真机数据核对、APP_ORIGIN / 家庭 Access 与源站防绕过，再核对 cloudflared 的入口网络并配置路由。当前不直接把 cloudflared 加入数据库网络，不在 NAS 或路由器公开 PostgreSQL。
+之后仍需：用户执行已验证的逻辑存档导入与真机核对、局域网实际页面 / 保存验收；公网家庭 Access 与源站防绕过是后续独立步骤，再核对 cloudflared 的入口网络并配置路由。当前不直接把 cloudflared 加入数据库网络，不在 NAS 或路由器公开 PostgreSQL。
 
 ## 验证记录
 
