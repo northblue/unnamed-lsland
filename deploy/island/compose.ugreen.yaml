@@ -1,0 +1,40 @@
+# Preparation template: image does not exist until you publish it.
+# Save without starting; replace image and DATABASE_URL privately first.
+version: '3.8'
+services:
+  web:
+    image: ghcr.io/northblue/unnamed-island:sha-REPLACE_FULL_COMMIT
+    platform: linux/amd64
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    environment:
+      NODE_ENV: production
+      ISLAND_DATABASE_PROVIDER: postgresql
+      DATABASE_URL: ''
+      PORT: '3000'
+      HOSTNAME: 0.0.0.0
+    # No host port or Tunnel yet: origin / authentication and save migration are pending.
+    networks:
+      data: {}
+      app:
+        aliases:
+          - island-web
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+networks:
+  data:
+    external: true
+    name: nas-postgres-data
+  app: {}

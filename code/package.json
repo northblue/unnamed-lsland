@@ -1,0 +1,40 @@
+{
+  "name": "unnamed-island",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:generate": "prisma generate && prisma generate --config prisma.postgresql.config.mjs",
+    "db:validate": "prisma validate && prisma validate --config prisma.postgresql.config.mjs",
+    "db:migrate": "wrangler d1 migrations apply unnamed-island-db --local",
+    "test:storage": "node scripts/verify-storage.mjs",
+    "test": "node --test src/game/*.test.js",
+    "db:deploy": "wrangler d1 migrations apply unnamed-island-db --remote",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "db:pg:deploy": "node scripts/postgres-cli.mjs deploy",
+    "db:pg:status": "node scripts/postgres-cli.mjs status",
+    "test:database": "node --test src/lib/*.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.16",
+    "@prisma/adapter-d1": "^7.10.1",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "^7.10.1",
+    "dotenv": "^18.0.9",
+    "next": "^16.4.5",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "server-only": "^0.0.1",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "prisma": "^7.10.1",
+    "wrangler": "^4.158.0"
+  }
+}

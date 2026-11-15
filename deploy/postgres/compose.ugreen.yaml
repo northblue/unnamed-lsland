@@ -1,0 +1,47 @@
+# UGREEN GUI import variant. Save with "run immediately" UNCHECKED.
+# Before first start: fill THREE different >=32-character passwords locally,
+# and place init/10-projects.sh beside this file in the project directory.
+version: '3.8'
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.7-pg17-bookworm
+    platform: linux/amd64
+    restart: unless-stopped
+    stop_grace_period: 60s
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: nas_admin
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ''
+      ISLAND_DB_PASSWORD: ''
+      MIND_DB_PASSWORD: ''
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=trust
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+      - /volume1/backup/nas-postgres:/backups
+    networks:
+      data:
+        aliases:
+          - nas-postgres
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U nas_admin -d postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+networks:
+  data:
+    name: nas-postgres-data
+    internal: true

@@ -1,0 +1,107 @@
+name: Build and verify island image
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish verified images to GHCR
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: island-image-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v4
+      - name: Image names
+        id: names
+        env:
+          OWNER: ${{ github.repository_owner }}
+        run: echo "image=ghcr.io/${OWNER,,}/unnamed-island" >> "$GITHUB_OUTPUT"
+      - name: Build Web image and run unit tests
+        uses: docker/build-push-action@v7
+        with:
+          context: ./code
+          target: web
+          platforms: linux/amd64
+          load: true
+          tags: island-web:ci
+          cache-from: type=gha,scope=island-web
+          cache-to: type=gha,mode=max,scope=island-web
+      - name: Build maintenance image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./code
+          target: tools
+          platforms: linux/amd64
+          load: true
+          tags: island-tools:ci
+      - name: Verify real PostgreSQL migration and standalone server
+        run: |
+          set -euo pipefail
+          docker network create island-ci
+          docker run -d --name island-db --network island-ci \
+            -e POSTGRES_USER=island_app -e POSTGRES_PASSWORD=ci-only-password \
+            -e POSTGRES_DB=unnamed_island postgres:17-bookworm
+          ready=false
+          for attempt in $(seq 1 40); do
+            if docker exec island-db pg_isready -h 127.0.0.1 -U island_app -d unnamed_island; then ready=true; break; fi
+            sleep 2
+          done
+          test "$ready" = true
+          db_url=postgresql://island_app:ci-only-password@island-db:5432/unnamed_island
+          docker run --rm --network island-ci -e DATABASE_URL="$db_url" \
+            island-tools:ci node scripts/postgres-cli.mjs deploy
+          docker run -d --name island-web --network island-ci \
+            -p 127.0.0.1:3000:3000 -e DATABASE_URL="$db_url" island-web:ci
+          ready=false
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://localhost:3000/api/health; then ready=true; break; fi
+            sleep 2
+          done
+          test "$ready" = true
+          curl --fail --silent http://localhost:3000/ > /dev/null
+          node code/scripts/verify-image.mjs
+          node code/scripts/verify-storage.mjs
+          docker restart island-web
+          ready=false
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://localhost:3000/api/health; then ready=true; break; fi
+            sleep 2
+          done
+          test "$ready" = true
+          node code/scripts/verify-image.mjs --saved
+      - name: Logs and cleanup
+        if: always()
+        run: |
+          docker logs island-web 2>&1 || true
+          docker logs island-db 2>&1 || true
+          docker rm -f island-web island-db || true
+          docker network rm island-ci || true
+      - name: Sign in to GHCR
+        if: inputs.publish
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish verified commit images
+        if: inputs.publish
+        env:
+          IMAGE: ${{ steps.names.outputs.image }}
+          REVISION: ${{ github.sha }}
+        run: |
+          docker tag island-web:ci "$IMAGE:sha-$REVISION"
+          docker tag island-tools:ci "$IMAGE:sha-$REVISION-tools"
+          docker push "$IMAGE:sha-$REVISION"
+          docker push "$IMAGE:sha-$REVISION-tools"

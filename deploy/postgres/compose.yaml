@@ -1,0 +1,54 @@
+name: nas-postgres
+
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-pgvector/pgvector:0.8.7-pg17-bookworm}
+    platform: linux/amd64
+    restart: unless-stopped
+    stop_grace_period: 60s
+    shm_size: 128mb
+    mem_limit: 1g
+    environment:
+      POSTGRES_USER: nas_admin
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a strong admin password}
+      ISLAND_DB_PASSWORD: ${ISLAND_DB_PASSWORD:?Set a separate island password}
+      MIND_DB_PASSWORD: ${MIND_DB_PASSWORD:?Set a separate mind password}
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=trust
+      PGDATA: /var/lib/postgresql/data/pgdata
+    command:
+      - postgres
+      - -c
+      - shared_buffers=128MB
+      - -c
+      - max_connections=50
+      - -c
+      - work_mem=4MB
+      - -c
+      - maintenance_work_mem=64MB
+    volumes:
+      - ${POSTGRES_DATA_DIR:?Set POSTGRES_DATA_DIR in .env}:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+      - ./backups:/backups
+    networks:
+      data:
+        aliases:
+          - nas-postgres
+    # No host ports. Application containers join nas-postgres-data.
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -h 127.0.0.1 -U "$$POSTGRES_USER" -d postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+
+networks:
+  data:
+    name: nas-postgres-data
+    internal: true
