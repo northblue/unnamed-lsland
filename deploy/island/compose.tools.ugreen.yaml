@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   tools:
-    image: ghcr.io/northblue/unnamed-island:sha-REPLACE_FULL_COMMIT-tools
+    image: ghcr.io/northblue/unnamed-island@sha256:e9c53209e64155fe8f69ed45a34a39fea90ecb9735812eb0f5b91e0dce172c91
     platform: linux/amd64
     restart: 'no'
     environment:

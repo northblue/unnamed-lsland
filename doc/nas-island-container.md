@@ -1,6 +1,14 @@
 # 小岛独立容器与镜像发布
 
-更新：2026-11-15。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；尚未发布镜像或更改 NAS。
+更新：2026-11-16。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；已由 Actions 43716616878 发布 Web / tools 镜像，摘要与 linux/amd64 架构及匿名拉取已核对；尚未更改 NAS。
+
+## 当前已发布版本
+
+- 来源提交：`9c7f0c5c8e1846957ae3e3417915714fdfab4e39`。
+- 发布验收：[Actions 43716616878](https://github.com/northblue/unnamed-lsland/actions/runs/43716616878)，publish=true，构建 / 数据库验收 / 两次镜像上传均成功。
+- Web 与 tools 的完整 SHA 标签和不可变摘要见 [release.json](../deploy/island/release.json)。两份 Compose 已固定该摘要，不再含镜像占位值；DATABASE_URL 仍为空，由用户在 NAS 私下填写。
+- 两个镜像的 manifest 摘要与 push 日志一致，config 均为 linux/amd64；无凭据匿名拉取验证成功，当前绿联不需要 GHCR 令牌。仅做了发布与拉取可用性验证，没有在 NAS 上运行。
+- [绿联配置包](../deploy/unnamed-island-nas.zip) 含两份 Compose、release.json 与操作说明，无密码、数据库或本地存档。先导入保存，不立即启动，后续先完成逻辑存档迁移工具和访问保护。
 
 ## 文件与边界
 
@@ -25,7 +33,7 @@
 
 准备 /volume2/docker/unnamed-island 作为项目配置目录即可，应用自身暂无上传文件，不挂载 PostgreSQL data 或 Mac 源码。导入 compose.ugreen.yaml 时先取消立即运行：
 
-1. 将 image 占位标签改为已成功发布的完整 SHA 标签或 digest。
+1. 当前 image 已固定发布成功的 digest；首次无需替换。以后更新使用新版本已验证的 digest，不用 latest。
 2. 在 NAS 私下填 DATABASE_URL：postgresql://island_app:URL编码后的密码@nas-postgres:5432/unnamed_island。这里仅使用 island_app，不是管理员账号。
 3. 核实 nas-postgres-data 已存在；不要新建另一个 PostgreSQL 服务。检查镜像拉取授权。
 4. **当前模板未映射宿主机端口、没有 Tunnel 路由，API 仍仅允许 localhost。** 健康检查只证明数据库表可查询，不代表存档已迁移、认证完成或公网可用。缺 URL / 服务不可达 / 尚未建表时健康接口返回 503。
@@ -36,8 +44,8 @@
 
 ## 验证记录
 
-本机没有 Docker；第三次 [GitHub Actions 43716023910](https://github.com/northblue/unnamed-lsland/actions/runs/43716023910) 已全部通过，验收提交 22ccece：Linux Web / tools 镜像构建、75 项测试、临时 PostgreSQL 迁移、health、页面 / JS / 鱼鸟 GLB、存档读写 / 校验 / Origin / revision 并发及 Web 重启后的状态比对。publish=false，未发布到 GHCR。已在 Mac 生成 standalone，复制到项目之外的临时目录并补 public / .next/static，验证 HTML、浏览器 JS、鱼 / 鸟 GLB 可访问；PostgreSQL 指向本机关闭端口时，API / health 返回 503，日志是数据库不可达而不是缺模块。临时服务已停止。
+本机没有 Docker；第三次 [GitHub Actions 43716023910](https://github.com/northblue/unnamed-lsland/actions/runs/43716023910) 已全部通过，验收提交 22ccece：Linux Web / tools 镜像构建、75 项测试、临时 PostgreSQL 迁移、health、页面 / JS / 鱼鸟 GLB、存档读写 / 校验 / Origin / revision 并发及 Web 重启后的状态比对。该验收运行 publish=false；随后 publish=true 的 43716616878 重验并发布成功。已在 Mac 生成 standalone，复制到项目之外的临时目录并补 public / .next/static，验证 HTML、浏览器 JS、鱼 / 鸟 GLB 可访问；PostgreSQL 指向本机关闭端口时，API / health 返回 503，日志是数据库不可达而不是缺模块。临时服务已停止。
 
-本地检查不代替 Linux 验收；上述 Linux / PostgreSQL 步骤已由 CI 补充通过。早期两次失败分别来自容器监听地址与 HTTP Host 的差异、Node fetch 移除测试指定 Host；修复和原始 HTTP 安全检查均已重验。当前还未验证 NAS 受限角色下的应用迁移、真实存档 / 备份恢复、生产资源限制和家庭访问保护。Compose / workflow 已做 YAML 与结构检查，未在 UGREEN 导入本轮配置。
+本地检查不代替 Linux 验收；上述 Linux / PostgreSQL 步骤已由 CI 补充通过。早期两次失败分别来自容器监听地址与 HTTP Host 的差异、Node fetch 移除测试指定 Host；修复和原始 HTTP 安全检查均已重验。发布运行 43716616878 已对提交 9c7f0c5 重新验收并上传两个镜像。当前还未验证 NAS 受限角色下的应用迁移、真实存档 / 备份恢复、生产资源限制和家庭访问保护。Compose / workflow 已做 YAML 与结构检查，未在 UGREEN 导入本轮配置。
 
 实现依据：[Next standalone 输出](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)、[Docker GitHub Actions](https://docs.docker.com/build/ci/github-actions/)、[GitHub GHCR 发布](https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images)。

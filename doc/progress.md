@@ -1,6 +1,6 @@
 # 开发进度
 
-更新：2026-11-15。此处先列当前状态；下方历史记录保留当时的实现与验证范围，后续条目优先，不将旧结论自动视为最新版验收。
+更新：2026-11-16。此处先列当前状态；下方历史记录保留当时的实现与验证范围，后续条目优先，不将旧结论自动视为最新版验收。
 
 
 ### 2026-11-15 小岛 PostgreSQL 代码适配第一步
@@ -39,12 +39,21 @@
 - 首次运行 43714880308 因容器 request.url 的 0.0.0.0 导致合法本地 GET 403，已修复。第二次 43715643137 的安全测试因 Node fetch 移除自定义 Host 而错误发出 localhost，改用 node:http 后完整重验成功。未通过删除本地或 Origin 校验来绕过问题。
 - 当前只完成临时 CI 数据库的验收，不是 NAS 受限角色 / 实际存档迁移 / 容量 / 备份恢复或 Access 权限验收。NAS 应用 Compose 不公开端口，入口认证、APP_ORIGIN 与旧岛导出 / 拒绝覆盖导入仍待实施。镜像只在 CI runner 构建，未推送注册表；下一步按用户选择发布已验证版本并继续迁移准备。
 
+### 2026-11-16 GHCR 首次镜像发布成功
+
+- 用户要求继续，启动 publish=true 的 [Actions 43716616878](https://github.com/northblue/unnamed-lsland/actions/runs/43716616878)，来源提交 9c7f0c5c8e1846957ae3e3417915714fdfab4e39；完整构建、75 项测试、临时 PostgreSQL / 保存 / 重启验收与镜像上传成功。未访问或部署 NAS。
+- 两个镜像为 ghcr.io/northblue/unnamed-island 的完整提交 SHA 标签及对应 -tools 标签。Web digest：sha256:1875eccc79accd646a3a4377e3a3b716b875703fb0cc45975a9222b0335bf13e；tools digest：sha256:e9c53209e64155fe8f69ed45a34a39fea90ecb9735812eb0f5b91e0dce172c91。已用实际 registry manifest 计算摘要并读取 config，均匹配、linux/amd64。
+- 无凭据匿名拉取两个镜像成功，当前 NAS 不需要 registry 令牌；未调用可见性修改接口。GitHub 包元数据 API 对当前 Git 凭据返回 403，未据此推断包可见性设置；匿名访问结论来自 registry 实测。
+- deploy/island/release.json 记录来源 / 运行链接 / 标签 / 摘要，两个绿联 Compose 已固定不可变 digest，DATABASE_URL 保持空白。新增无密码 / 无存档的绿联配置 ZIP，并更新发布说明和部署计划。
+- 本轮只发布镜像与准备文件，未导入 UGREEN、创建 Web 容器、运行 NAS 迁移、配置端口 / Tunnel、改动 Mac 存档或 NAS 数据。下一阶段仍是逻辑存档导出 / 拒绝覆盖导入及访问保护，不能把镜像可拉取视为已经上线。
+
 ## 当前状态
 
 | 项目 | 实现情况 |
 | --- | --- |
 | 技术与名称 | 无名岛 / Unnamed Island，unnamed-island；Next.js + JavaScript + Three.js，应用位于 code/ |
 | NAS 共享 PostgreSQL | 用户截图确认 PostgreSQL 17.12、两项目库及所属账号、Mind Friend 的 vector 0.8.7 和 mind_app TCP 密码登录；跨库拒绝已由截图 / 用户反馈核对；首次挂载目录备份和同实例临时库恢复演练成功；业务数据迁移后的核对 / 完整重启回归待验证；小岛默认 D1 / SQLite，已增加可选 PostgreSQL 客户端与独立基线，未接 NAS |
+| 镜像发布 | GHCR Web / tools 已通过 CI 验收并发布，绿联模板固定 digest；尚未在 NAS 运行 Web 或迁移旧岛 |
 | 本地数据库 | Prisma + Wrangler 模拟 D1（SQLite）；0001 / 0002 / 0003 增量迁移已应用 |
 | 探索 / 采集 / 建造 | 已实现；最新陆地半轴 20×15.5、外海半径 33，新增高地 / 山丘 / 沙丘 / 礁石，推荐空地及坡度校验 |
 | 存档 / 管理 | 岛名、材料、耗尽资源 / 树木生长进度、角色位置、建筑、鱼篓和鱼池自动保存；岛名 / 木石 / 建筑可在管理界面修改 |

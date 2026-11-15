@@ -1,12 +1,12 @@
 # 无名岛 NAS 首次部署计划
 
-更新：2026-11-15。用户已选择共享 PostgreSQL，以及自己 / 家人共用当前岛屿。仅使用 UGREEN 图形界面操作 NAS。本文取代此前普通 SQLite 的部署建议；当前游戏默认仍运行 PrismaD1 / SQLite，已有可选 PostgreSQL 接入和独立迁移文件，尚未迁移。
+更新：2026-11-16。用户已选择共享 PostgreSQL，以及自己 / 家人共用当前岛屿。仅使用 UGREEN 图形界面操作 NAS。本文取代此前普通 SQLite 的部署建议；当前游戏默认仍运行 PrismaD1 / SQLite，已有可选 PostgreSQL 接入和独立迁移文件，尚未迁移。
 
 ## 已准备与未完成
 
 已准备 [PostgreSQL 图形界面配置包](../deploy/postgres/README.md) 和 [上传 ZIP](../deploy/nas-postgres-setup.zip)：Compose、数据库 / 角色初始化、可选准备 / 验证 / 备份脚本。静态和脚本模拟检查通过；当前 Mac 无 Docker，NAS 客户端自动读取不稳定；用户在 UGREEN 部署后提供日志，确认 PostgreSQL 17.12 服务正常运行，项目库 / 所属角色及 vector 0.8.7 已由后续用户查询截图核实，mind_app 密码登录、隔离检查已有截图 / 用户反馈；第一次逻辑备份与当前空库的临时库恢复已通过。真实业务数据、重启回归和空新实例整机恢复尚待验证。
 
-已准备 [小岛独立容器与镜像发布文件](nas-island-container.md)，本机 standalone 隔离检查和 Linux 镜像 / 临时 PostgreSQL 云端验收已通过；尚未发布 GHCR、未接生产域名 / Access，未修改存档。现有 D1 的数据保留。
+已准备 [小岛独立容器与镜像发布文件](nas-island-container.md)，本机 standalone 隔离检查和 Linux 镜像 / 临时 PostgreSQL 云端验收已通过；已发布 GHCR 并固定 Compose 摘要，尚未在 NAS 运行应用或接生产域名 / Access，未修改存档。现有 D1 的数据保留。
 
 ## 目标结构
 
