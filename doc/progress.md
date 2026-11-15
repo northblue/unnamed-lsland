@@ -30,7 +30,7 @@
 
 - 用户要求继续后，以 publish=false 启动 Actions 43714880308。Linux Web / tools 镜像已实际构建成功，构建中的测试通过；临时 PostgreSQL 17.12 成功应用基线，health 返回 200。但存档检查失败（403），不能记为整体验收通过，镜像未发布。
 - 原因：Next standalone 在绑定 0.0.0.0 的容器中重建 request.url 时使用监听地址，旧 localhost 校验错误拒绝带真实 Host: localhost 的请求。改用经过严格 localhost / 127.0.0.1 / [::1] 白名单校验的 HTTP Host，写入仍要求协议和端口均一致的 Origin；不信任 X-Forwarded-Host，不放开公网 / 域名访问，也不把 Host 校验当身份认证。
-- 新增四项本地请求测试（8 项服务端测试通过），CI smoke 加入公网 Host + 伪造 forwarded 头仍被拒绝的验收。修复后重新跑 CI，最终结果另记录；未访问 NAS。
+- 新增四项本地请求测试（8 项服务端测试通过），CI smoke 加入公网 Host + 伪造 forwarded 头仍被拒绝的验收。第二次 CI 43715643137 的正常本地 GET 已成功，但安全 smoke 使用 Node fetch 设置 Host；该客户端会删除自定义 Host，导致测试实际仍发 localhost，预期 403 却得到 200。已核对 Undici 实现，改为 node:http 原始请求真实发送 Host，再完整重验；最终结果另记录，未访问 NAS。
 
 ## 当前状态
 

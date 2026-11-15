@@ -1,6 +1,7 @@
 // Smoke check an isolated CI database; never use this script against a NAS save.
 import assert from 'node:assert/strict';
 import { readFileSync, writeFileSync } from 'node:fs';
+import { get } from 'node:http';
 
 const base = 'http://localhost:3000';
 const snapshot = process.env.RUNNER_TEMP ? `${process.env.RUNNER_TEMP}/island-ci-save.json` : null;
@@ -8,10 +9,14 @@ assert.ok(snapshot, 'Run only in the isolated GitHub Actions smoke check');
 const response = await fetch(`${base}/api/island`);
 assert.equal(response.status, 200);
 const save = await response.json();
-const denied = await fetch(`${base}/api/island`, {
-  headers: { Host: 'public.example.com', 'X-Forwarded-Host': 'localhost:3000' },
+// Node fetch strips custom Host. Use raw HTTP to exercise the actual wire header.
+const deniedStatus = await new Promise((resolve, reject) => {
+  get(`${base}/api/island`, { headers: { Host: 'public.example.com', 'X-Forwarded-Host': 'localhost:3000' } }, (response) => {
+    response.resume();
+    resolve(response.statusCode);
+  }).on('error', reject);
 });
-assert.equal(denied.status, 403, 'Forwarded headers must not bypass the local host restriction');
+assert.equal(deniedStatus, 403, 'Forwarded headers must not bypass the local host restriction');
 if (process.argv.includes('--saved')) {
   const previous = JSON.parse(readFileSync(snapshot, 'utf8'));
   assert.deepEqual(save.state, previous.state, 'State changed across container restart');
