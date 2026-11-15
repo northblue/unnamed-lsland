@@ -71,3 +71,7 @@ Docker 构建上下文为 code/，Dockerfile 的 web / tools 分别对应应用�
 ## 现有存档导出
 
 `npm run save:export` 使用只读 SQLite backup API 导出当前 D1 岛屿到被 Git / Docker 排除的 transfers/。完整 SQLite 副本保留本机，JSON / SQL 导入包含 checksum、事务和目标非空拒绝保护，不需要升级 NAS 镜像。步骤见 [Mac → NAS 存档迁移](../doc/island-save-migration.md)。
+
+## 局域网访问
+
+可显式设置 `APP_ORIGIN=http://192.168.4.82:3080`，再将 NAS 该 IP 的 3080 映射到容器 3000；默认未设置仍仅 localhost。写入需精确匹配 Origin，伪造 forwarded 头不放行。先迁移旧存档，再启用浏览器入口，具体版本和操作见 [局域网说明](../doc/nas-lan-access.md)。

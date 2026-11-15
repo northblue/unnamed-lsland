@@ -63,7 +63,8 @@ jobs:
           docker run --rm --network island-ci -e DATABASE_URL="$db_url" \
             island-tools:ci node scripts/postgres-cli.mjs deploy
           docker run -d --name island-web --network island-ci \
-            -p 127.0.0.1:3000:3000 -e DATABASE_URL="$db_url" island-web:ci
+            -p 127.0.0.1:3000:3000 -e DATABASE_URL="$db_url" \
+            -e APP_ORIGIN=http://192.168.4.82:3080 island-web:ci
           ready=false
           for attempt in $(seq 1 40); do
             if curl --fail --silent http://localhost:3000/api/health; then ready=true; break; fi
@@ -73,6 +74,7 @@ jobs:
           curl --fail --silent http://localhost:3000/ > /dev/null
           node code/scripts/verify-image.mjs
           node code/scripts/verify-storage.mjs
+          node code/scripts/verify-lan.mjs
           docker restart island-web
           ready=false
           for attempt in $(seq 1 40); do

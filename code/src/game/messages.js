@@ -61,8 +61,8 @@ export const messages = {
     storageErrors: {
       invalidPond: '鱼池数据无效或超过 24 条。',
       invalidCatch: '鱼篓数据无效。',
-      databaseUnavailable: '无法连接本地数据库', saveConflict: '其他页面已更新这个岛屿。请先保留当前修改，再刷新读取最新数据。',
-      localOnly: '管理功能仅开放给本机 localhost。', invalidVersion: '存档版本不兼容。', invalidName: '岛名须为 1–40 个字符。',
+      databaseUnavailable: '无法连接数据库', saveConflict: '其他页面已更新这个岛屿。请先保留当前修改，再刷新读取最新数据。',
+      localOnly: '当前访问地址未获准，请使用配置的小岛地址。', invalidVersion: '存档版本不兼容。', invalidName: '岛名须为 1–40 个字符。',
       invalidResources: '资源须为 0–1,000,000 的整数。', invalidWorld: '资源点状态无效。', invalidPlayer: '角色位置无效。',
       invalidBuildings: '建筑数据无效，请检查坐标与编号。', invalidRevision: '存档版本号无效。', noSpace: '岛上没有足够空地。',
       building_water: '建筑有部分伸入海中，请调整坐标。', building_obstacle: '建筑与树木、岩石或鱼池重叠。',
@@ -137,8 +137,8 @@ export const messages = {
     storageErrors: {
       invalidPond: 'Invalid pond data or more than 24 fish.',
       invalidCatch: 'Invalid fish basket data.',
-      databaseUnavailable: 'Cannot connect to the local database', saveConflict: 'Another page updated this island. Keep a copy of your edits, then reload the latest save.',
-      localOnly: 'Management is available on localhost only.', invalidVersion: 'Unsupported save version.', invalidName: 'Use 1–40 characters for the island name.',
+      databaseUnavailable: 'Cannot connect to the database', saveConflict: 'Another page updated this island. Keep a copy of your edits, then reload the latest save.',
+      localOnly: 'This address is not allowed. Use the configured island address.', invalidVersion: 'Unsupported save version.', invalidName: 'Use 1–40 characters for the island name.',
       invalidResources: 'Resources must be integers from 0 to 1,000,000.', invalidWorld: 'Invalid resource node state.', invalidPlayer: 'Invalid player position.',
       invalidBuildings: 'Invalid building data. Check coordinates and IDs.', invalidRevision: 'Invalid save revision.', noSpace: 'There is no room for another hut.',
       building_water: 'The hut extends into the sea. Adjust its coordinates.', building_obstacle: 'The hut overlaps a tree, rock or fish pond.',

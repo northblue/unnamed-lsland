@@ -55,6 +55,14 @@
 - 本地 78 项测试通过（67 游戏 + 11 服务端），新增 WAL 备份 / 源文件和 WAL 不变 / 全字段时间戳 / 篡改拒绝 / 不覆盖 / 权限 / 多数据库歧义测试。新 CI 工作流已编写，用合成存档在普通角色 PostgreSQL 测导入 / 重放拒绝 / 错库 / 校验失败回滚 / 只读漂移发现，以及已发布 Web 读回与重启；最终运行结果后续记录。未改网页或发布镜像，不额外重建 Next。
 - 实际 NAS 旧岛导入尚未执行，目标是否为空未检查；继续前用户须停止 Web、做一次建表后的新备份，再上传可信导出包。入口 / Access / APP_ORIGIN 与实际存档备份恢复仍待实施，见 island-save-migration.md。
 
+### 2026-11-16 存档迁移云端验收与局域网入口准备
+
+- [迁移验收 Actions 43721854761](https://github.com/northblue/unnamed-lsland/actions/runs/43721854761) 对 87a71a9 结论 success：合成 WAL 存档导出、普通 island_app 角色导入、错库拒绝、校验失败整事务回滚、非空 / 重放拒绝、只读检查发现漂移；已发布 Web 镜像读回完整状态 / revision / updatedAt 并在重启后再次一致。真实 Mac 存档未上传 CI。
+- 已生成本机私有迁移 ZIP（code/transfers/2026-11-15T13-56-37-254Z/unnamed-island-save-transfer.zip），只包含六个逻辑迁移文件，不含 source.sqlite / 凭据；压缩包内容与 checksum 一致，原 D1 当前状态仍与导出快照一致。完整 SQLite 备份仅保留 Mac，实际 NAS 导入等待用户操作。
+- 用户补充局域网访问请求，网络截图确认 NAS 192.168.4.82 / DHCP，约定端口 3080；当前浏览器 ERR_CONNECTION_REFUSED 对应旧 Compose 没有映射端口。正在增加明确 APP_ORIGIN 的局域网访问，不把仅端口映射等同存档可用。
+- 新 requestAccess：默认仍 localhost；APP_ORIGIN 仅限显式私有 LAN IP / loopback origin，严格匹配 Host 与写入 Origin 的协议 / 端口，不信任 forwarded 头；保留校验、revision 和 loopback 运维请求。新增中英提示、三项访问规则测试及原始 HTTP LAN 保存 / 拒绝 / 冲突 CI 步骤。本地 81 项测试通过（67 游戏 + 14 服务端），新版镜像 CI / 发布结果稍后记录。
+- 局域网浏览器入口需在旧岛导入成功后再启用，避免默认空岛占用目标；真实 NAS 配置、存档导入和页面保存尚未由助手执行，步骤见 nas-lan-access.md。
+
 ## 当前状态
 
 | 项目 | 实现情况 |

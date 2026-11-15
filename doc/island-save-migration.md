@@ -49,6 +49,6 @@ psql -X -U nas_admin -d unnamed_island -v ON_ERROR_STOP=1 -f island-verify.sql
 
 ## 验证范围
 
-本地已通过 WAL 一致性备份、源文件 / WAL 不变、完整游戏状态 / revision / 时间戳、篡改校验和拒绝、目录不覆盖、权限和数据库发现歧义等测试。云端工作流 verify-save-transfer.yml 使用合成存档与一次性 PostgreSQL：普通应用角色导入、错库拒绝、非空 / 重复导入拒绝、中途失败整事务回滚、只读检查发现漂移，以及已发布 Web 镜像读回 / 重启核对。实际运行结果见开发进度，不把已编写的检查视为已执行。
+本地已通过 WAL 一致性备份、源文件 / WAL 不变、完整游戏状态 / revision / 时间戳、篡改校验和拒绝、目录不覆盖、权限和数据库发现歧义等测试。云端工作流 verify-save-transfer.yml 使用合成存档与一次性 PostgreSQL：普通应用角色导入、错库拒绝、非空 / 重复导入拒绝、中途失败整事务回滚、只读检查发现漂移，以及已发布 Web 镜像读回 / 重启核对。[Actions 43721854761](https://github.com/northblue/unnamed-lsland/actions/runs/43721854761) 已完成上述全部步骤，结论 success；真实 NAS 导入仍待用户执行。
 
 SQLite API 依据 [Node 官方文档](https://nodejs.org/download/release/v24.22.1/docs/api/sqlite.html)。当前 Mac Node 会提示 node:sqlite 实验性警告；已用本机实际 API / WAL 测试验证，不需安装 SQLite 驱动。
