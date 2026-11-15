@@ -1,6 +1,6 @@
 # 小岛独立容器与镜像发布
 
-更新：2026-11-15。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。本轮准备本地文件，没有提交 / 推送代码、运行 GitHub Actions、发布镜像或更改 NAS。当前工作目录没有 .git，远端内容尚未成功读取，不能确认现有仓库布局。
+更新：2026-11-15。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。尚未运行 GitHub Actions、发布镜像或更改 NAS。
 
 ## 文件与边界
 

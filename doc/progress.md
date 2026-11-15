@@ -24,7 +24,7 @@
 
 - 用户授权提交；git ls-remote 已成功连接 northblue/unnamed-lsland，未返回远端分支 / 标签。本地原无 .git，现初始化 main，首次版本收录现有游戏、素材许可、文档、数据库适配和独立容器 / CI 配置，保留远端地址原有 lsland 拼写。
 - 提交候选 219 个文件，约 23.5 MB；检查排除 node_modules、.next、.wrangler、本地数据库、真实 .env / .dev.vars、生成客户端与日志，并检查常见私钥 / GitHub token 标记；部署 ZIP 内不含真实 .env 或数据库归档。没有改游戏逻辑或 NAS 数据。
-- 使用上轮已通过的 71 项测试、standalone 构建 / 隔离 HTTP 和 YAML 检查，本轮仅 Git 整理 / 文档不重复运行应用测试。首次提交 / 推送结果以 Git 返回为准；Actions 仍为手动触发，提交不会自动发布镜像或更新 NAS。
+- 使用上轮已通过的 71 项测试、standalone 构建 / 隔离 HTTP 和 YAML 检查，本轮仅 Git 整理 / 文档不重复运行应用测试。首次提交 42537de 已成功推送 origin/main 并建立跟踪；Actions 仍为手动触发，提交不会自动发布镜像或更新 NAS。后续文档状态同步另作小提交。
 
 ## 当前状态
 
