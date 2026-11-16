@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from 'react';
 
 async function readResponse(response) {
   const body = await response.json();
+  if (response.status === 401 && typeof window !== 'undefined') window.dispatchEvent(new Event('unnamed-island-auth-required'));
   if (!response.ok) throw new Error(body.error || 'databaseUnavailable');
   return body;
 }

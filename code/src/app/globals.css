@@ -1,4 +1,23 @@
 * { box-sizing: border-box; }
+.login-shell { min-height: 100svh; display: grid; place-items: center; padding: 24px; background: radial-gradient(ellipse at 20% 80%, #8dbab7, transparent 65%), linear-gradient(135deg, #dce4cd, #bad8dc); }
+.login-card { width: min(100%, 420px); padding: 30px; border: 1px solid #ffffffb3; border-radius: 24px; background: #fffdf1ed; box-shadow: 0 24px 90px #294e4c26; color: #294e4c; }
+.login-languages { display: flex; justify-content: flex-end; gap: 6px; }
+.login-card button { font: inherit; cursor: pointer; border: 0; border-radius: 8px; }
+.login-languages button { background: #e7ecdf; padding: 7px 10px; color: #294e4c; font-size: 12px; }
+.login-languages button[aria-pressed=true] { background: #365f50; color: white; }
+.login-mark { display: block; font-size: 46px; color: #729c7e; margin-top: 14px; }
+.login-card h1 { font-size: 30px; letter-spacing: 2px; margin: 16px 0; }
+.login-card h1 span { font-size: 13px; letter-spacing: 2px; margin-top: 8px; }
+.login-card p { font-size: 14px; line-height: 1.7; }
+.login-card label { display: block; font-size: 14px; margin: 24px 0 8px; }
+.login-card input { width: 100%; padding: 12px; font: inherit; border: 1px solid #a5bca9; border-radius: 9px; background: white; color: #294e4c; }
+.login-card .login-submit { width: 100%; margin-top: 20px; padding: 13px; color: white; background: #365f50; }
+.login-card button:disabled { opacity: .6; cursor: wait; }
+.login-card .login-note { color: #68817a; font-size: 12px; margin: 20px 0 0; }
+.login-card .login-error { color: #a03e32; font-size: 13px; }
+.login-card :focus-visible { outline: 2px solid #578870; outline-offset: 3px; }
+.auth-controls { margin: 8px 0; font-size: 12px; }
+.auth-controls a { display: block; color: #365f50; padding: 7px 0; }
 html, body { margin: 0; width: 100%; height: 100%; }
 body { color: #294e4c; background: #b8cecd; font-family: Arial, 'PingFang SC', sans-serif; }
 .game-shell { position: relative; width: 100%; height: 100svh; min-height: 540px; overflow: hidden; }

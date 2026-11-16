@@ -83,6 +83,44 @@ jobs:
           done
           test "$ready" = true
           node code/scripts/verify-image.mjs --saved
+      - name: Verify shared-password access and restart
+        run: |
+          set -euo pipefail
+          docker rm -f island-web
+          db_url=postgresql://island_app:ci-only-password@island-db:5432/unnamed_island
+          docker run -d --name island-web --network island-ci \
+            -p 127.0.0.1:3000:3000 -e DATABASE_URL="$db_url" \
+            -e APP_ORIGIN=http://192.168.4.82:3080 \
+            -e PUBLIC_ORIGIN=https://unnamed-island.northblue.cc \
+            -e ISLAND_SHARED_PASSWORD=ci-only-shared-password \
+            -e ISLAND_SESSION_SECRET=ci-only-session-secret-at-least-32-characters island-web:ci
+          ready=false
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://localhost:3000/api/health; then ready=true; break; fi
+            sleep 2
+          done
+          test "$ready" = true
+          node code/scripts/verify-shared-auth.mjs
+          docker restart island-web
+          ready=false
+          for attempt in $(seq 1 40); do
+            if curl --fail --silent http://localhost:3000/api/health; then ready=true; break; fi
+            sleep 2
+          done
+          test "$ready" = true
+          node code/scripts/verify-shared-auth.mjs --saved
+          docker rm -f island-web
+          docker run -d --name island-web --network island-ci \
+            -p 127.0.0.1:3000:3000 -e DATABASE_URL="$db_url" \
+            -e APP_ORIGIN=http://192.168.4.82:3080 \
+            -e PUBLIC_ORIGIN=https://unnamed-island.northblue.cc island-web:ci
+          ready=false
+          for attempt in $(seq 1 40); do
+            if test "$(curl --silent -o /dev/null -w '%{http_code}' http://localhost:3000/api/health)" = 503; then ready=true; break; fi
+            sleep 2
+          done
+          test "$ready" = true
+          node code/scripts/verify-shared-auth.mjs --broken
       - name: Logs and cleanup
         if: always()
         run: |

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { HUT, hutMaterialsMissing } from '../game/building';
 import IslandManager from './IslandManager';
+import AuthControls from './AuthControls';
 import { useIslandStorage } from './useIslandStorage';
 import { createIslandState } from '../game/islandState';
 import { messages } from '../game/messages';
@@ -149,6 +150,9 @@ export default function IslandGame() {
     <section className="storage-card" aria-label={text.storageTitle}>
       <button type="button" disabled={status !== 'ready' || openingManager || offline} onClick={openManager}>{openingManager ? text.savingChanges : text.managerTitle}</button>
       <p role="status">{offline ? text.offlineNote : text.saveStates[storage.saveStatus]}</p>
+      <AuthControls text={text.auth} onBeforeLogout={async () => {
+        if (gameRef.current && !offline) await storage.save(gameRef.current.getSnapshot());
+      }} />
       <button className="ambience-toggle" type="button" disabled={status !== 'ready' || ambientBusy} aria-pressed={ambientEnabled} title={text.nature.soundHelp} onClick={toggleAmbience}>{ambientEnabled ? text.nature.soundOn : text.nature.soundOff}</button>
       {ambientError && <p role="alert">{text.nature.soundError}</p>}
       {!offline && storage.saveError && <p className="manager-error" role="alert">{text.storageErrors[storage.saveError] || text.storageErrors.databaseUnavailable}</p>}

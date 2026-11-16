@@ -1,6 +1,7 @@
 import { getPrisma } from '../../../lib/prisma';
 import { createIslandState, validateIslandState } from '../../../game/islandState';
 import { checkIslandRequest } from '../../../lib/requestAccess';
+import { sessionStatus } from '../../../lib/sharedAuth';
 
 export const runtime = 'nodejs';
 const ISLAND_ID = 'local-island';
@@ -15,6 +16,8 @@ function response(record) {
 
 export async function GET(request) {
   if (!checkIslandRequest(request)) return Response.json({ error: 'localOnly' }, { status: 403, headers });
+  const auth = sessionStatus(request);
+  if (!auth.ok) return Response.json({ error: auth.error }, { status: auth.status, headers });
   try {
     const prisma = getPrisma();
     const initial = createIslandState();
@@ -37,6 +40,8 @@ export async function GET(request) {
 
 export async function PUT(request) {
   if (!checkIslandRequest(request, true)) return Response.json({ error: 'localOnly' }, { status: 403, headers });
+  const auth = sessionStatus(request);
+  if (!auth.ok) return Response.json({ error: auth.error }, { status: auth.status, headers });
   let state;
   let revision;
   try {

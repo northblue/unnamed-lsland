@@ -16,7 +16,8 @@
     "db:pg:deploy": "node scripts/postgres-cli.mjs deploy",
     "db:pg:status": "node scripts/postgres-cli.mjs status",
     "test:database": "node --test src/lib/*.test.js",
-    "save:export": "node scripts/export-save.mjs"
+    "save:export": "node scripts/export-save.mjs",
+    "access:prepare": "node scripts/prepare-access.mjs"
   },
   "keywords": [],
   "author": "",

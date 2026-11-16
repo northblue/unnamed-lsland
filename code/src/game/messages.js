@@ -1,5 +1,6 @@
 export const messages = {
   zh: {
+    auth: { title: '登录无名岛 · Unnamed Island', heading: '欢迎回到无名岛', intro: '输入岛主提供的共享密码，一起继续这座岛的故事。', password: '共享密码', enter: '进入小岛', entering: '正在验证…', logout: '保存并退出登录', leaving: '正在保存并退出…', relogin: '在新标签页重新登录', language: '界面语言', zhLabel: '中文', enLabel: 'English', note: '登录可保持 7 天。这是一座家人共用的小岛。', errors: { invalidPassword: '密码不正确，请再试一次。', rateLimited: '尝试次数较多，请稍等一分钟再试。', authUnavailable: '登录暂时不可用，请联系岛主检查访问设置。', invalidRequest: '登录请求无效，请重新输入密码。', localOnly: '请使用岛主提供的小岛地址。', logoutSave: '退出前保存未成功，请先检查保存状态再重试。' } },
     constellations: { names: { cassiopeia: '仙后座', orion: '猎户座', crux: '南十字座' }, note: '星座为艺术化排布，非实时星图。' },
     fishPreview: { title: '小岛模型 · 近距离观察', link: '近距离观察岛上模型', back: '← 返回小岛', help: '拖动旋转，滚轮缩放；观察小鱼摆尾、海鸟拍翼、海洋访客、沙滩生物和人物细节。', choose: '选择模型', animals: { coral: '珊瑚鱼', blue: '蓝色鱼', gold: '金色鱼', silver: '银色鱼', bird: '岛上小鸟', seagull: '海鸥', whale: '鲸鱼', dolphin: '海豚', seal: '海豹', shell: '海螺', crab: '螃蟹', explorer: '小岛人物' }, idle: '站立观察', walking: '行走动作', beach: '沙滩生态模型', swimming: '摆尾巡游 · 预览按体型缩放', flying: '拍翼飞行', perched: '收翼停栖', newModel: '骨骼游泳模型', oldModel: '原程序鱼 · 对照', scene: '小岛模型三维预览', loading: '正在加载动物模型…', ready: '模型已就绪，可以旋转观察。', error: '这个模型暂时加载失败，可选择其他动物或返回小岛。', note: '可近看小岛生物与人物；人物外观升级保留原有游戏规则。这些是风格化模型；此预览不修改存档。' },
     supplies: { title: '海岸物资与树木', help: '靠近漂流物（8 单位内），按 E、点击它或点下方按钮收集。木板 +2 木材；物资箱 +1 木材、+2 石料。', collect: '收集附近漂流物 · E', waiting: '附近没有可收集的漂流物，去海岸看看。', growing: '正在生长的树：{count} · 约 3 分钟在线长成；建屋处不再生。', found: '收集漂流物：+{wood} 木材 · +{stone} 石料', plank: '木板', crate: '物资箱', prompt: '附近有{kind}可收集。' },
@@ -61,6 +62,7 @@ export const messages = {
     storageErrors: {
       invalidPond: '鱼池数据无效或超过 24 条。',
       invalidCatch: '鱼篓数据无效。',
+      authenticationRequired: '登录已过期。请在新标签页重新登录，然后返回这里重试保存。', authUnavailable: '访问验证暂时不可用，请联系岛主检查设置。',
       databaseUnavailable: '无法连接数据库', saveConflict: '其他页面已更新这个岛屿。请先保留当前修改，再刷新读取最新数据。',
       localOnly: '当前访问地址未获准，请使用配置的小岛地址。', invalidVersion: '存档版本不兼容。', invalidName: '岛名须为 1–40 个字符。',
       invalidResources: '资源须为 0–1,000,000 的整数。', invalidWorld: '资源点状态无效。', invalidPlayer: '角色位置无效。',
@@ -76,6 +78,7 @@ export const messages = {
     },
   },
   en: {
+    auth: { title: 'Sign in · Unnamed Island', heading: 'Welcome to your island', intro: 'Enter the shared password from your host to continue the island story together.', password: 'Shared password', enter: 'Enter the island', entering: 'Checking…', logout: 'Save and sign out', leaving: 'Saving and signing out…', relogin: 'Sign in again in a new tab', language: 'Language', zhLabel: '中文', enLabel: 'English', note: 'Stay signed in for 7 days. Your family shares this island.', errors: { invalidPassword: 'Incorrect password. Please try again.', rateLimited: 'Too many attempts. Please wait a minute and try again.', authUnavailable: 'Sign-in is unavailable. Ask your host to check the access settings.', invalidRequest: 'Invalid sign-in request. Enter the password again.', localOnly: 'Use the island address provided by your host.', logoutSave: 'Your save did not finish. Check the save status before signing out.' } },
     constellations: { names: { cassiopeia: 'Cassiopeia', orion: 'Orion', crux: 'Southern Cross' }, note: 'Artistic constellations, not a live sky map.' },
     fishPreview: { title: 'Island models · A closer look', link: 'Inspect island models', back: '← Back to island', help: 'Drag to orbit, scroll to zoom. Explore swimming fish, bird flight, marine visitors, beach wildlife and the explorer.', choose: 'Choose a model', animals: { coral: 'Coral fish', blue: 'Blue fish', gold: 'Golden fish', silver: 'Silver fish', bird: 'Island bird', seagull: 'Seagull', whale: 'Whale', dolphin: 'Dolphin', seal: 'Seal', shell: 'Conch shell', crab: 'Crab', explorer: 'Explorer' }, idle: 'Standing', walking: 'Walking', beach: 'Beach wildlife model', swimming: 'Swimming · Preview scaled to fit', flying: 'Flapping flight', perched: 'Perching', newModel: 'Skeletal swim model', oldModel: 'Original fish · Compare', scene: '3D island model preview', loading: 'Loading animal model…', ready: 'Model ready. Drag to inspect.', error: 'This model could not load. Try another animal or return to the island.', note: 'Inspect wildlife and the explorer. Character details keep the same gameplay rules. This preview does not change your save.' },
     supplies: { title: 'Coastal supplies & trees', help: 'Within 8 units, press E, click debris or use the button below. Planks: +2 wood; crates: +1 wood, +2 stone.', collect: 'Collect nearby supplies · E', waiting: 'No supplies within reach. Explore the shore.', growing: 'Trees growing: {count} · About 3 minutes of active play; no regrowth under huts.', found: 'Salvaged: +{wood} wood · +{stone} stone', plank: 'planks', crate: 'a supply crate', prompt: 'Nearby {kind} ready to collect.' },
@@ -137,6 +140,7 @@ export const messages = {
     storageErrors: {
       invalidPond: 'Invalid pond data or more than 24 fish.',
       invalidCatch: 'Invalid fish basket data.',
+      authenticationRequired: 'Your session expired. Sign in in a new tab, then return here and retry saving.', authUnavailable: 'Access verification is unavailable. Ask your host to check the settings.',
       databaseUnavailable: 'Cannot connect to the database', saveConflict: 'Another page updated this island. Keep a copy of your edits, then reload the latest save.',
       localOnly: 'This address is not allowed. Use the configured island address.', invalidVersion: 'Unsupported save version.', invalidName: 'Use 1–40 characters for the island name.',
       invalidResources: 'Resources must be integers from 0 to 1,000,000.', invalidWorld: 'Invalid resource node state.', invalidPlayer: 'Invalid player position.',

@@ -19,13 +19,47 @@ export function lanOrigin(value) {
   return url;
 }
 
-export function checkIslandRequest(request, write = false, env = process.env) {
-  let configured;
-  try { configured = lanOrigin(env.APP_ORIGIN); } catch { return false; }
-  if (checkLocalRequest(request, write)) return true;
-  if (!configured) return false;
+export function publicOrigin(value) {
+  if (!value) return null;
+  let url;
+  try { url = new URL(value); } catch { throw new Error('PUBLIC_ORIGIN must be an HTTPS domain origin'); }
+  if (url.protocol !== 'https:' || url.username || url.password || url.port
+    || url.href !== `${url.origin}/` || isIP(url.hostname) || !url.hostname.includes('.')
+    || !/^[a-z0-9.-]+$/i.test(url.hostname) || url.hostname.endsWith('.local')) {
+    throw new Error('PUBLIC_ORIGIN must be an HTTPS domain origin');
+  }
+  return url;
+}
+
+export function requestOrigin(request, env = process.env) {
+  const configured = lanOrigin(env.APP_ORIGIN);
+  const published = publicOrigin(env.PUBLIC_ORIGIN);
   const host = request.headers.get('host') ?? new URL(request.url).host;
-  if (host.toLowerCase() !== configured.host.toLowerCase()) return false;
-  // External origin is explicit; ignore all forwarded host/protocol headers.
-  return !write || request.headers.get('origin') === configured.origin;
+  for (const allowed of [published, configured]) {
+    if (allowed && host.toLowerCase() === allowed.host.toLowerCase()) return allowed.origin;
+  }
+  if (checkLocalRequest(request)) return new URL(`${new URL(request.url).protocol}//${host}`).origin;
+  return null;
+}
+
+export function checkIslandRequest(request, write = false, env = process.env) {
+  try {
+    const origin = requestOrigin(request, env);
+    // The external origin is explicit; never trust forwarded host/protocol headers.
+    return !!origin && (!write || request.headers.get('origin') === origin);
+  } catch { return false; }
+}
+
+export function publicHttpsRedirect(request, env = process.env) {
+  const configured = publicOrigin(env.PUBLIC_ORIGIN);
+  const current = new URL(request.url);
+  const host = request.headers.get('host') ?? current.host;
+  if (!configured || host.toLowerCase() !== configured.host.toLowerCase()) return null;
+  // Cloudflare overwrites X-Forwarded-Proto. This signal only selects HTTPS redirects;
+  // it never authenticates a visitor or changes the allowed authority.
+  const protocol = request.headers.get('x-forwarded-proto') ?? current.protocol.slice(0, -1);
+  if (protocol === 'https') return null;
+  const target = new URL(configured.origin);
+  target.pathname = current.pathname; target.search = current.search;
+  return target;
 }
