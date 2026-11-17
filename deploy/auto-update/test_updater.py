@@ -27,6 +27,7 @@ class FakeDocker:
         self.up_calls = []
         self.fail_candidate = False
         self.fail_rollback = False
+        self.retained = []
 
     def configuration(self):
         reference = next(line.strip().split(": ", 1)[1] for line in self.path.read_text().splitlines() if line.strip().startswith("image:"))
@@ -42,7 +43,12 @@ class FakeDocker:
         return self.old if identifier == OLD else self.new
 
     def candidate(self, channel):
+        if self.reference not in self.retained:
+            raise UpdateError("Current immutable reference must be retained before pulling the channel")
         return self.new
+
+    def retain(self, reference):
+        self.retained.append(reference)
 
     def up(self):
         reference = self.configuration()["services"]["web"]["image"]
@@ -79,6 +85,7 @@ class UpdaterTests(unittest.TestCase):
         self.assertEqual(self.compose.read_text(), self.source.replace(OLD, NEW))
         self.assertEqual(self.compose.stat().st_mode & 0o777, 0o600)
         self.assertEqual(self.driver.up_calls, [NEW])
+        self.assertEqual(self.driver.retained, [OLD])
         self.assertFalse(self.updater.pending.exists())
         self.assertEqual((self.updater.state / "compose.previous.yaml").read_text(), self.source)
         self.assertTrue(all("test-private-value" not in message for message in self.messages))

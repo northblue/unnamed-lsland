@@ -109,6 +109,12 @@ class Docker:
             raise UpdateError("Candidate is not linux/amd64")
         return image
 
+    def retain(self, reference):
+        # A pull by digest creates an explicit immutable local reference. A mere
+        # RepoDigests lookup can vanish when containerd replaces a mutable tag.
+        # Do this before pulling the channel, while the previous Web is running.
+        self.run(["pull", "--platform", "linux/amd64", reference])
+
     def up(self):
         self.run(self.compose_command("up", "--no-deps", "--no-build", "--pull", "never",
                                       "--wait", "--wait-timeout", str(self.wait), self.service), self.wait + 60)
@@ -176,8 +182,9 @@ class Updater:
         # older Docker CLIs cannot resolve through image-inspect by ID.
         if not re.fullmatch(re.escape(self.repository) + r"@sha256:[0-9a-f]{64}", current["Config"]["Image"]):
             raise UpdateError("Pin the bootstrap Web image by digest before enabling updates")
-        previous_image = self.docker.image(current["Config"]["Image"])
-        previous = digest_for(previous_image, self.repository)
+        previous = current["Config"]["Image"]
+        self.docker.retain(previous)
+        previous_image = self.docker.image(previous)
         baseline = (previous_image.get("Config", {}).get("Labels") or {}).get(CONTRACT, "")
         if not re.fullmatch(r"[0-9a-f]{64}", baseline):
             raise UpdateError("Install the bootstrap Web image once before enabling auto updates")
