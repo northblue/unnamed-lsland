@@ -10,6 +10,7 @@
 | [共享 PostgreSQL 图形界面部署](../deploy/postgres/README.md) | UGREEN Compose、独立项目库 / 账号、备份与验证状态 |
 | [独立 NAS PostgreSQL 项目文档](../../nas-postgres/doc/README.md) | 共享数据库的部署、存储、安全、备份恢复与脚本；位于相邻独立项目 |
 | [小岛 PostgreSQL 适配](postgresql-app-adapter.md) | 双数据库模式、基线迁移与当前验证边界 |
+| [自动发布与 NAS 更新](nas-auto-update.md) | 推送触发构建、已验证镜像频道、定时更新和失败回退 |
 | [共享密码与 Tunnel](nas-public-access.md) | 固定密码、会话、NAS 更新与公网域名启用顺序 |
 | [局域网访问](nas-lan-access.md) | NAS IP、3080 端口、APP_ORIGIN 与迁移后启用顺序 |
 | [Mac → NAS 存档迁移](island-save-migration.md) | 只读导出、完整本地备份、拒绝覆盖的 SQL 导入与核对 |

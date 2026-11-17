@@ -26,6 +26,8 @@ USER node
 CMD ["node", "scripts/postgres-cli.mjs", "status"]
 
 FROM base AS web
+ARG STORAGE_CONTRACT=manual-build
+LABEL cc.northblue.island.storage-contract=$STORAGE_CONTRACT
 ENV NODE_ENV=production ISLAND_DATABASE_PROVIDER=postgresql PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static

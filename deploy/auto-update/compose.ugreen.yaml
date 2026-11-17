@@ -1,0 +1,41 @@
+# A SEPARATE UGREEN project: unnamed-island-updater. No passwords belong here.
+# The published setup package replaces the image placeholder with a verified digest.
+services:
+  updater:
+    image: ghcr.io/northblue/unnamed-island:updater-setup-required
+    platform: linux/amd64
+    restart: unless-stopped
+    user: '0:0'
+    network_mode: none
+    read_only: true
+    stop_grace_period: 240s
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=32m
+    environment:
+      PROJECT_NAME: unnamed-island
+      SERVICE_NAME: web
+      COMPOSE_FILE: /volume2/docker/apps/unnamed-island/docker-compose.yaml
+      CHANNEL_IMAGE: ghcr.io/northblue/unnamed-island:nas-stable
+      AUTO_UPDATE_ENABLED: 'true'
+      CHECK_INTERVAL_SECONDS: '300'
+      HEALTH_TIMEOUT_SECONDS: '180'
+      STATE_DIR: /state
+    volumes:
+      # The socket grants Docker administration, not just access to this app.
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Use the SAME absolute path on both sides, so UGREEN Compose labels stay valid.
+      - /volume2/docker/apps/unnamed-island:/volume2/docker/apps/unnamed-island
+      - ./state:/state
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: '3'
