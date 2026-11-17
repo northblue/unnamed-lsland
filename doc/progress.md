@@ -5,10 +5,12 @@
 
 ### 2026-11-17 手机专注小岛模式
 
+- NAS 新 Web 镜像：`ghcr.io/northblue/unnamed-island@sha256:091cd8d4b9afa06a46f8dd71197d2fe487d3ca29f05a6e769160feb85371bba0`；更新现有项目 image 并重新部署即可，不需数据库迁移或修改密码。
+
 - 新增双语“专注小岛 / 显示菜单”触屏按钮，最小高度 44px；隐藏标题、语言、时间、资源 / 建造 / 钓鱼 / 镜头 / 存档面板、教程和页脚，保留恢复入口、加载 / 渲染错误状态、采集反馈、保存失败或离线提示及数据库错误 / 管理对话框。
 - 手机窄屏（≤700px）首次默认简洁模式，桌面默认原界面；手动选择独立保存在浏览器 localStorage，失败时仍可正常切换。只用 CSS 隐藏面板，不卸载 Three.js、清空玩法、停止自动保存或改变各面板原有展开状态。横屏简洁模式移除原 540px 最小高度，场景随 ResizeObserver 调整；按钮考虑安全区域。
-- 已通过 PostgreSQL standalone 构建。使用无数据库的本机 3019 离线试玩，浏览器实际检查 390×844 首次默认隐藏、一键恢复、英文切换、刷新记忆和 844×390 横屏；横屏 scene / pageHeight 均 390，无额外页面高度。截图 [mobile-focus-2026-11-17.png](references/mobile-focus-2026-11-17.png)。没有连接或改动 NAS / Mac 真实存档，临时服务已停止。
-- 本轮为可逆界面调整，不新增镜像实现的单元测试；既有 CI 会执行所需回归与构建后发布。NAS 新镜像发布结果待补记，真实手机触控 / Safari、安全区和跨设备性能未验收；未增加虚拟摇杆或完整手机玩法控制。
+- 已通过 PostgreSQL standalone 构建。使用无数据库的本机 3019 离线试玩，浏览器实际检查 390×844 首次默认隐藏、一键恢复、英文切换、刷新记忆和 844×390 横屏；横屏 scene / pageHeight 均 390，无额外页面高度。截图 [mobile-focus-2026-11-17.png](references/mobile-focus-2026-11-17.png)。未用验证页面连接或改动 NAS / Mac 真实存档，临时 3019 服务已停止。用户随后询问本机入口，确认 3000 未启动后已启动 localhost:3000 开发服务；实际 HTML 200 并包含 focus-toggle / 专注小岛，保持运行供用户查看。
+- 本轮为可逆界面调整，不新增镜像实现的单元测试；最终提交 d0d3e201e33f3b2449863175eab850aa032fee57 已由 [Actions 44064151022](https://github.com/northblue/unnamed-lsland/actions/runs/44064151022) 完成 88 项测试、Linux 构建、临时 PostgreSQL / LAN / 认证 / 保存 / 重启回归并发布。实际 registry manifest 摘要、linux/amd64 和匿名拉取已核对，四份模板 / release / ZIP 已更新；新镜像尚未部署到 NAS。真实手机触控 / Safari、安全区和跨设备性能未验收；未增加虚拟摇杆或完整手机玩法控制。
 - 用户已确认 NAS 新版局域网登录可用，并在 Cloudflare 填写 unnamed-island.northblue.cc → http://192.168.4.82:3080；本机无 Cookie 实际访问公网根地址返回 307 → https://unnamed-island.northblue.cc/login，Cloudflare cf-cache-status 为 DYNAMIC；已确认 DNS / TLS / Tunnel / 未登录跳转，未使用真实密码登录或读取公网存档。
 
 ### 2026-11-17 共享密码镜像发布验收

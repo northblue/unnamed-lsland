@@ -4,7 +4,7 @@
 
 ## 目前状态
 
-NAS 已完成旧岛导入 / 校验，LAN 首页、health、存档 200。共享密码代码、本地单元测试和生产构建已通过，新镜像已通过 [Actions 43951191099](https://github.com/northblue/unnamed-lsland/actions/runs/43951191099) 验收 / 发布，摘要、linux/amd64 和匿名拉取已核对；详见 progress.md 和 deploy/island/release.json。尚未替用户改 NAS 配置或创建域名路由。先部署支持认证的新镜像并确认 LAN 登录，再添加公网路由。
+NAS 已完成旧岛导入 / 校验，LAN 首页、health、存档 200。共享密码代码、本地单元测试和生产构建已通过，新镜像已通过 [Actions 43951191099](https://github.com/northblue/unnamed-lsland/actions/runs/43951191099) 验收 / 发布，摘要、linux/amd64 和匿名拉取已核对；详见 progress.md 和 deploy/island/release.json。用户已完成 NAS 共享密码部署与域名路由，公网未登录访问已实测跳转 /login；实际密码登录 / 保存由用户现场验收。后续手机界面镜像更新按 release.json，仅改现有 Web image 即可，无需重设密码或路由。首次部署时仍按下述顺序。
 
 ## 密码在哪里
 

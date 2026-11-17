@@ -4,11 +4,11 @@
 
 ## 当前已发布版本
 
-- 来源提交：`5b969c1f8c6bba5018fb1202b4cfb72c08ca4bec`（共享密码、PUBLIC_ORIGIN、LAN）。
-- [Actions 43951191099](https://github.com/northblue/unnamed-lsland/actions/runs/43951191099) publish=true / success：88 项测试、数据库 / 保存 / LAN / 认证 / 重启和缺配置拒绝访问验收通过，Web / tools 上传成功。
+- 来源提交：`d0d3e201e33f3b2449863175eab850aa032fee57`（手机专注模式、共享密码、PUBLIC_ORIGIN、LAN）。
+- [Actions 44064151022](https://github.com/northblue/unnamed-lsland/actions/runs/44064151022) publish=true / success：88 项测试、数据库 / 保存 / LAN / 认证 / 重启和缺配置拒绝访问验收通过，Web / tools 上传成功。
 - [release.json](../deploy/island/release.json) 记录不可变镜像摘要和完整 SHA 标签；实际 registry manifest 摘要、linux/amd64 与匿名拉取均已核对。四份 Compose 已更新固定摘要，真实密码 / DATABASE_URL 保持为空。
 - [绿联配置包](../deploy/unnamed-island-nas.zip) 包含基础 / LAN / 共享密码 / tools 四份模板和说明。密码版用 compose.public.ugreen.yaml，更新现有 Web，保留其 DATABASE_URL，按 [公网入口说明](nas-public-access.md) 填写私密密码 / 密钥。
-- 上一 LAN 版本 440addd 已在 NAS 运行、旧岛导入和 HTTP 读取已验证；新认证版本尚未部署到 NAS，Tunnel / DNS 尚未创建。历史版本保留在 deploy/island/releases/。
+- 上一 LAN 版本 440addd 已在 NAS 运行、旧岛导入和 HTTP 读取已验证；共享密码基线 5b969c1 已部署，公网未登录跳转已实测；本次手机界面镜像尚未部署到 NAS。历史版本保留在 deploy/island/releases/。
 
 ## 文件与边界
 
