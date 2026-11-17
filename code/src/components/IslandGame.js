@@ -135,8 +135,8 @@ export default function IslandGame() {
     <button className="focus-toggle" type="button" aria-pressed={focusMode} onClick={toggleFocusMode}>
       <span aria-hidden="true">{focusMode ? '☰' : '◉'}</span> {focusMode ? text.display.showMenus : text.display.focusIsland}
     </button>
-    {focusMode && (storage.saveStatus === 'error' || offline) && <p className="focus-save-status" role="status">
-      {offline ? text.offlineNote : text.display.saveWarning}
+    {focusMode && (status === 'loading' || status === 'renderError' || storage.saveStatus === 'error' || offline) && <p className="focus-save-status" role="status">
+      {status === 'loading' || status === 'renderError' ? text.status[status] : offline ? text.offlineNote : text.display.saveWarning}
     </p>}
     <header className="title-card">
       <span className="eyebrow">UNNAMED ISLAND</span>
