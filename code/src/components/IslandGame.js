@@ -29,6 +29,19 @@ export default function IslandGame() {
   const [ambientEnabled, setAmbientEnabled] = useState(false);
   const [ambientBusy, setAmbientBusy] = useState(false);
   const [ambientError, setAmbientError] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+
+  useEffect(() => {
+    let preferred;
+    try { preferred = localStorage.getItem('unnamed-island-focus-mode'); } catch { /* Optional preference. */ }
+    setFocusMode(preferred === 'true' || (preferred !== 'false' && window.matchMedia('(max-width: 700px)').matches));
+  }, []);
+
+  function toggleFocusMode() {
+    const next = !focusMode;
+    setFocusMode(next);
+    try { localStorage.setItem('unnamed-island-focus-mode', String(next)); } catch { /* Optional preference. */ }
+  }
 
   useEffect(() => {
     const query = window.matchMedia('(max-width: 700px)');
@@ -117,8 +130,14 @@ export default function IslandGame() {
     closeManager();
   }
 
-  return <main className="game-shell" data-night={hud.time?.night ? 'true' : 'false'}>
+  return <main className="game-shell" data-night={hud.time?.night ? 'true' : 'false'} data-focus={focusMode ? 'true' : 'false'}>
     <div className="scene" ref={container} aria-label={text.scene} tabIndex={0} />
+    <button className="focus-toggle" type="button" aria-pressed={focusMode} onClick={toggleFocusMode}>
+      <span aria-hidden="true">{focusMode ? '☰' : '◉'}</span> {focusMode ? text.display.showMenus : text.display.focusIsland}
+    </button>
+    {focusMode && (storage.saveStatus === 'error' || offline) && <p className="focus-save-status" role="status">
+      {offline ? text.offlineNote : text.display.saveWarning}
+    </p>}
     <header className="title-card">
       <span className="eyebrow">UNNAMED ISLAND</span>
       <h1><span className="island-title" title={displayName}>{displayName}</span><span>{text.tagline}</span></h1>

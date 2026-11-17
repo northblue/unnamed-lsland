@@ -203,3 +203,17 @@ footer { position: absolute; bottom: 23px; left: 42px; right: 42px; display: fle
 .fish-model-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
 .fish-model-stage { position: relative; flex: 0 0 auto; height: clamp(280px, 52svh, 520px); overflow: hidden; }
 .fish-model-stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; }
+
+/* Keep the restore button outside the hidden panels, including on touch screens. */
+.focus-toggle { position: absolute; top: 38px; right: 160px; z-index: 9; display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 14px; border: 1px solid #ffffffad; border-radius: 12px; background: #fffdf1ed; color: #294e4c; box-shadow: 0 4px 18px #183b391a; font: inherit; font-size: 13px; cursor: pointer; touch-action: manipulation; }
+.focus-toggle[aria-pressed="true"] { background: #365f50ed; color: #fffdf1; }
+.focus-toggle:focus-visible { outline: 3px solid #b38b40; outline-offset: 3px; }
+.game-shell[data-focus="true"] { min-height: 0; }
+.game-shell[data-focus="true"] > :is(.title-card, .language-switch, .time-card, .right-panel, .chapter, .guide, footer) { display: none; }
+.focus-save-status { position: absolute; z-index: 8; left: max(20px, env(safe-area-inset-left)); bottom: max(14px, env(safe-area-inset-bottom)); max-width: calc(100% - 185px); margin: 0; padding: 8px 12px; border-radius: 10px; background: #fffdf1ed; color: #8c4c2d; font-size: 12px; line-height: 1.5; pointer-events: none; }
+@media(max-width: 700px) {
+  .focus-toggle { top: auto; right: max(20px, env(safe-area-inset-right)); bottom: max(14px, env(safe-area-inset-bottom)); }
+  .game-shell .guide { right: 165px; width: auto; max-width: none; bottom: max(14px, env(safe-area-inset-bottom)); }
+  .game-shell .camera-panel { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 56px); }
+  .game-shell .build-card { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 112px); }
+}
