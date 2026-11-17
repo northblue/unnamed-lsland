@@ -47,6 +47,13 @@ docker compose -p "$project" -f "$compose" up --wait --wait-timeout 40
 docker build --builder default -f "$folder/healthy.Dockerfile" --build-arg MARKER=new -t "$repository:nas-stable" "$folder"
 docker push "$repository:nas-stable"
 candidate=$(docker image inspect "$repository:nas-stable" --format '{{index .RepoDigests 0}}')
+# Diagnostic probes contain image references/version data only, never container Env.
+docker run --rm --network none -v /var/run/docker.sock:/var/run/docker.sock \
+  --entrypoint docker island-updater:ci version
+docker run --rm --network none -v /var/run/docker.sock:/var/run/docker.sock \
+  --entrypoint docker island-updater:ci image inspect "$old" --format '{{.Id}}'
+docker run --rm --network none -v /var/run/docker.sock:/var/run/docker.sock \
+  --entrypoint docker island-updater:ci image inspect "$repository:nas-stable" --format '{{.Id}}'
 check() {
   docker run --rm --network none --read-only \
     --cap-drop ALL --cap-add CHOWN --cap-add DAC_OVERRIDE \
