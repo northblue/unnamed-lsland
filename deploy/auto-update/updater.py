@@ -171,7 +171,12 @@ class Updater:
         environment = dict(item.split("=", 1) for item in current["Config"].get("Env", []) if "=" in item)
         if any(environment.get(key) != str(value) for key, value in service.get("environment", {}).items() if value is not None):
             raise UpdateError("Saved Compose and running environment differ; deploy the saved config first")
-        previous_image = self.docker.image(current["Image"])
+        # Query the immutable repository reference, not the container's Image ID.
+        # Engines using the containerd image store can expose a manifest ID that
+        # older Docker CLIs cannot resolve through image-inspect by ID.
+        if not re.fullmatch(re.escape(self.repository) + r"@sha256:[0-9a-f]{64}", current["Config"]["Image"]):
+            raise UpdateError("Pin the bootstrap Web image by digest before enabling updates")
+        previous_image = self.docker.image(current["Config"]["Image"])
         previous = digest_for(previous_image, self.repository)
         baseline = (previous_image.get("Config", {}).get("Labels") or {}).get(CONTRACT, "")
         if not re.fullmatch(r"[0-9a-f]{64}", baseline):

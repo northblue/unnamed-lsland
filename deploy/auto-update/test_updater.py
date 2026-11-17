@@ -37,7 +37,9 @@ class FakeDocker:
                 "State": {"Running": True, "Health": {"Status": "healthy" if self.is_healthy else "unhealthy"}}}
 
     def image(self, identifier):
-        return self.old if identifier == "old-id" else self.new
+        if identifier == "old-id":
+            raise UpdateError("Synthetic containerd image ID lookup failure")
+        return self.old if identifier == OLD else self.new
 
     def candidate(self, channel):
         return self.new
