@@ -1,3 +1,5 @@
+> 后续共享密码与公网部署以 [共享密码与 Tunnel](nas-public-access.md) 为准；启用后 LAN 也需登录。
+
 # 小岛局域网访问
 
 更新：2026-11-16。用户网络截图确认 NAS LAN1 的 IPv4 为 192.168.4.82（DHCP）。目标地址为 `http://192.168.4.82:3080`，只供同一局域网的家庭共享岛试玩，不需要 Cloudflare Tunnel / 公网域名。
@@ -34,4 +36,4 @@ NAS 当前用 DHCP；地址以后变化时，APP_ORIGIN、ports 的绑定 IP 和
 
 本地测试覆盖显式 LAN Host、端口 / 协议 / Origin 错配、缺失 Origin、伪造 forwarded 头，以及非法 / 公网 APP_ORIGIN。云端镜像工作流会用原始 HTTP 发送真实 Host，测试局域网语义的 GET / PUT 和旧版本冲突；这些请求只连 CI localhost，192.168.4.82 是 HTTP 头测试值，不连接用户 NAS。
 
-81 项测试及上述原始 HTTP LAN 保存 / 拒绝 / 冲突检查已通过，镜像发布成功，摘要 / linux/amd64 / 匿名拉取也已实际核对。实际 NAS 页面打开、保存 / 刷新以及多设备表现仍需要用户现场验收，助手未修改 NAS。错误提示已集中更新中文 / English。
+81 项测试及上述原始 HTTP LAN 保存 / 拒绝 / 冲突检查已通过，镜像发布成功，摘要 / linux/amd64 / 匿名拉取也已实际核对。旧岛导入后，本机实际只读检查 NAS 首页 / health / 存档均 200（岛名 Island of Lucas & Ethan、木材 49、石料 16、鱼池 5、revision 688）。人工保存 / 刷新及多设备表现仍待现场验收，助手未修改 NAS。错误提示已集中更新中文 / English。

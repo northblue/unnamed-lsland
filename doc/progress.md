@@ -1,7 +1,15 @@
 # 开发进度
 
-更新：2026-11-16。此处先列当前状态；下方历史记录保留当时的实现与验证范围，后续条目优先，不将旧结论自动视为最新版验收。
+更新：2026-11-17。此处先列当前状态；下方历史记录保留当时的实现与验证范围，后续条目优先，不将旧结论自动视为最新版验收。
 
+
+### 2026-11-17 共享密码镜像发布验收
+
+- 来源提交 `5b969c1f8c6bba5018fb1202b4cfb72c08ca4bec`， [Actions 43951191099](https://github.com/northblue/unnamed-lsland/actions/runs/43951191099) publish=true / success。Linux 构建执行 67 项游戏 + 21 项服务端测试，Prisma 双 schema 生成 / 校验和 standalone 构建通过。
+- 临时 PostgreSQL 完成原存档读写 / 冲突 / LAN / 静态资源回归；共享密码模式实际 HTTP 验证页面 / 模型 / API 未授权拦截、错误密码、JSON 大小、Origin / Host / 伪造代理头拒绝、公共 HTTPS 重定向和 Cookie 属性、LAN 独立登录、保存 / 旧 revision 冲突、退出清 Cookie。Web 重启后签名会话与完整存档一致；公开域名配置但缺密码 / 密钥时接口和健康检查 503。
+- Web digest `sha256:ea5d60279fe3f7100a1d474f7c72f94ae743c82e7df447b64a34305bbd57e78f`；tools digest `sha256:6ae8354f6dcfbb6ce1a47459d9f5c9df2e0ba7f3e5f2b7c02ffccff0d72f58d3`。实际 registry manifest 计算摘要匹配，config 均 linux/amd64，无凭据匿名拉取通过。release.json / 四份模板已固定摘要，旧 LAN 版本留档。
+- 新增 compose.public.ugreen.yaml 与 nas-public-access.md；私密文件权限 600 / Git 忽略验证通过，YAML 与文档链接检查通过。配置 ZIP 只打包允许的模板 / 说明 / release，不含实际密钥或存档。浏览器目视中文排版、英文切换 / 错误密码提示已通过，临时 3019 服务已停止。
+- 未操作 NAS 的认证配置、Cloudflare 账户 / DNS / Tunnel；公网尚未端到端验收。下一步用户在现有 Web 配置更新 image、PUBLIC_ORIGIN、密码和签名密钥，保留 DATABASE_URL / APP_ORIGIN / 端口；LAN 登录验收后再加 northblue-nas 路由。登录后的真实游戏 UI / 人工保存退出、真实 HTTPS Cookie / 跨设备与限流负载仍待现场验证。
 
 ### 2026-11-16 NAS 存档与局域网验收、共享密码入口
 
@@ -10,7 +18,7 @@
 - 用户选择共用固定密码，确认公网域名 `https://unnamed-island.northblue.cc`。新增双语登录 / 保存后退出、7 天签名会话，密码或签名密钥轮换使旧会话失效。公网使用 Secure / HttpOnly / SameSite=Lax / __Host- Cookie；LAN HTTP 使用独立 Cookie，两入口不可互换会话。全体登录者仍共用同一座岛，没有个人账号 / 权限分级。
 - Proxy 保护页面 / 模型 / API，存档 API 另行验证会话，写入保留精确 Origin 和 revision 校验。PUBLIC_ORIGIN 配置后缺少密码或密钥返回 503，禁止静默关闭保护；Docker 回环健康检查不需登录但检查认证配置和数据库。公网 HTTP 转 HTTPS，仅传输判断使用 Cloudflare X-Forwarded-Proto，不能凭该头取得权限。
 - 登录接口限制每进程每分钟 20 次请求，限制 JSON 流大小，不记录密码；这不是分布式限流，进程重启清空计数。退出清除当前浏览器 Cookie，已复制的无状态令牌仍有效直至过期或密钥 / 密码轮换。保存遇到会话过期时保留当前页面，提示另开登录页后重试，避免强制刷新丢失未保存进度。
-- 已通过本地 21 项服务端测试、67 项游戏测试及 PostgreSQL standalone 构建；新增 CI 合成密码 / 临时 PostgreSQL 的公网 Host、LAN、保存冲突、退出、重启和缺配置验收。云端新镜像结果待后续补记；尚未更新 NAS 认证配置或创建 Tunnel 路由。
+- 已通过本地 21 项服务端测试、67 项游戏测试及 PostgreSQL standalone 构建；新增 CI 合成密码 / 临时 PostgreSQL 的公网 Host、LAN、保存冲突、退出、重启和缺配置验收。浏览器已目视中文登录页排版、英文切换与错误密码提示，临时服务未连接 NAS 或真实数据库。云端新镜像结果待后续补记；尚未更新 NAS 认证配置或创建 Tunnel 路由。
 - 私密设置生成脚本 `code/scripts/prepare-access.mjs` 写入 Git 忽略的 `deploy/island/.env.access.local`（权限 600、拒绝覆盖）；不放入镜像 / 发布 ZIP，不在终端输出值。部署步骤见 [共享密码与 Tunnel](nas-public-access.md)。
 
 ### 2026-11-15 小岛 PostgreSQL 代码适配第一步

@@ -1,3 +1,5 @@
+> 公网共享密码版本：见 [部署说明](../../doc/nas-public-access.md) 和 `compose.public.ugreen.yaml`；实际新镜像状态以 release.json / progress.md 为准。
+
 # Unnamed Island NAS container templates
 
 操作步骤与验证状态见 [小岛独立容器与镜像发布](../../doc/nas-island-container.md)。

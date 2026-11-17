@@ -1,16 +1,18 @@
 {
-  "sourceCommit": "440adddf4118aad19d7211796664d8e1c68dfaf0",
+  "sourceCommit": "5b969c1f8c6bba5018fb1202b4cfb72c08ca4bec",
   "platform": "linux/amd64",
-  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/43722484386",
+  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/43951191099",
   "lanOriginSupported": true,
+  "sharedPasswordSupported": true,
+  "publicOrigin": "https://unnamed-island.northblue.cc",
   "nasDeployed": false,
+  "anonymousPullVerified": true,
   "web": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-440adddf4118aad19d7211796664d8e1c68dfaf0",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:c19433c25516619acaa9e4ee22645d2eb81330c87d3dee1d94a7387db6b6f74e"
+    "tag": "ghcr.io/northblue/unnamed-island:sha-5b969c1f8c6bba5018fb1202b4cfb72c08ca4bec",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:ea5d60279fe3f7100a1d474f7c72f94ae743c82e7df447b64a34305bbd57e78f"
   },
   "tools": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-440adddf4118aad19d7211796664d8e1c68dfaf0-tools",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:67c3ced8ecb3400b9f1a785db8ae2440fb53037dc03d4572aede247e4017992e"
-  },
-  "anonymousPullVerified": true
+    "tag": "ghcr.io/northblue/unnamed-island:sha-5b969c1f8c6bba5018fb1202b4cfb72c08ca4bec-tools",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:6ae8354f6dcfbb6ce1a47459d9f5c9df2e0ba7f3e5f2b7c02ffccff0d72f58d3"
+  }
 }

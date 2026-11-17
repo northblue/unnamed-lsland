@@ -1,0 +1,45 @@
+# Shared-password profile. Verified source commit 5b969c1.
+# Update the EXISTING Web project; preserve its private DATABASE_URL.
+services:
+  web:
+    image: ghcr.io/northblue/unnamed-island@sha256:ea5d60279fe3f7100a1d474f7c72f94ae743c82e7df447b64a34305bbd57e78f
+    platform: linux/amd64
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    environment:
+      NODE_ENV: production
+      ISLAND_DATABASE_PROVIDER: postgresql
+      DATABASE_URL: ''
+      APP_ORIGIN: 'http://192.168.4.82:3080'
+      PUBLIC_ORIGIN: 'https://unnamed-island.northblue.cc'
+      ISLAND_SHARED_PASSWORD: '' # Copy private value; at least 12 characters.
+      ISLAND_SESSION_SECRET: '' # Copy private value; at least 32 characters.
+      PORT: '3000'
+      HOSTNAME: 0.0.0.0
+    # Preserve the LAN binding; Tunnel targets this address too.
+    ports:
+      - '192.168.4.82:3080:3000'
+    networks:
+      data: {}
+      app:
+        aliases:
+          - island-web
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+networks:
+  data:
+    external: true
+    name: nas-postgres-data
+  app: {}

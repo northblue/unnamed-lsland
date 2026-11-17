@@ -1,14 +1,14 @@
 # 小岛独立容器与镜像发布
 
-更新：2026-11-16。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；已由 Actions 43716616878 发布 Web / tools 镜像，摘要与 linux/amd64 架构及匿名拉取已核对；用户随后已在 NAS 启动 Web / tools，完成基线迁移且 health 200；旧岛导入和浏览器入口尚未完成。
+更新：2026-11-16。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；已由 Actions 43716616878 发布 Web / tools 镜像，摘要与 linux/amd64 架构及匿名拉取已核对；用户随后已在 NAS 启动 Web / tools，完成基线迁移且 health 200；旧岛导入与独立核对、局域网首页 / health / 存档 HTTP 200 已完成。共享密码与公网发布按 [最新入口说明](nas-public-access.md) 操作。
 
 ## 当前已发布版本
 
-- 来源提交：`440adddf4118aad19d7211796664d8e1c68dfaf0`（新增显式 LAN Origin）。
-- 发布验收：[Actions 43722484386](https://github.com/northblue/unnamed-lsland/actions/runs/43722484386)，publish=true，81 项测试、数据库 / LAN 访问验收与两次镜像上传均成功；首次发布 43716616878 留作历史。
-- Web 与 tools 的完整 SHA 标签和不可变摘要见 [release.json](../deploy/island/release.json)。两份 Compose 已固定该摘要，不再含镜像占位值；DATABASE_URL 仍为空，由用户在 NAS 私下填写。
-- 两个镜像的 manifest 摘要与 push 日志一致，config 均为 linux/amd64；无凭据匿名拉取验证成功，当前绿联不需要 GHCR 令牌。仅做了发布与拉取可用性验证，没有在 NAS 上运行。
-- [绿联配置包](../deploy/unnamed-island-nas.zip) 含基础 / LAN / tools 三份 Compose、release.json 与操作说明，无密码、数据库或本地存档。先完成旧岛导入，再更新现有 Web 的镜像 / APP_ORIGIN / 3080 端口；不要用空模板覆盖私密 DATABASE_URL。局域网步骤见 nas-lan-access.md。
+- 来源提交：`5b969c1f8c6bba5018fb1202b4cfb72c08ca4bec`（共享密码、PUBLIC_ORIGIN、LAN）。
+- [Actions 43951191099](https://github.com/northblue/unnamed-lsland/actions/runs/43951191099) publish=true / success：88 项测试、数据库 / 保存 / LAN / 认证 / 重启和缺配置拒绝访问验收通过，Web / tools 上传成功。
+- [release.json](../deploy/island/release.json) 记录不可变镜像摘要和完整 SHA 标签；实际 registry manifest 摘要、linux/amd64 与匿名拉取均已核对。四份 Compose 已更新固定摘要，真实密码 / DATABASE_URL 保持为空。
+- [绿联配置包](../deploy/unnamed-island-nas.zip) 包含基础 / LAN / 共享密码 / tools 四份模板和说明。密码版用 compose.public.ugreen.yaml，更新现有 Web，保留其 DATABASE_URL，按 [公网入口说明](nas-public-access.md) 填写私密密码 / 密钥。
+- 上一 LAN 版本 440addd 已在 NAS 运行、旧岛导入和 HTTP 读取已验证；新认证版本尚未部署到 NAS，Tunnel / DNS 尚未创建。历史版本保留在 deploy/island/releases/。
 
 ## 文件与边界
 

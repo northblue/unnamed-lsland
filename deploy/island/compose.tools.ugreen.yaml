@@ -2,7 +2,7 @@
 version: '3.8'
 services:
   tools:
-    image: ghcr.io/northblue/unnamed-island@sha256:67c3ced8ecb3400b9f1a785db8ae2440fb53037dc03d4572aede247e4017992e
+    image: ghcr.io/northblue/unnamed-island@sha256:6ae8354f6dcfbb6ce1a47459d9f5c9df2e0ba7f3e5f2b7c02ffccff0d72f58d3
     platform: linux/amd64
     restart: 'no'
     environment:

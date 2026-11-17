@@ -1,9 +1,9 @@
-# Published image pinned by digest; source commit 440addd.
+# Published image pinned by digest; source commit 5b969c1.
 # Update the EXISTING Web project after save import; preserve its private DATABASE_URL.
 version: '3.8'
 services:
   web:
-    image: ghcr.io/northblue/unnamed-island@sha256:c19433c25516619acaa9e4ee22645d2eb81330c87d3dee1d94a7387db6b6f74e
+    image: ghcr.io/northblue/unnamed-island@sha256:ea5d60279fe3f7100a1d474f7c72f94ae743c82e7df447b64a34305bbd57e78f
     platform: linux/amd64
     restart: unless-stopped
     init: true
