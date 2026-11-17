@@ -33,7 +33,7 @@
 3. 比较当前 / 新镜像的 PostgreSQL schema 与 migration 文件内容摘要。不同则记录 `MANUAL MIGRATION REQUIRED`，保留旧 Web，等待人工备份 / 迁移 / 更新。它不自动运行 Prisma、不更新 PostgreSQL 容器。
 4. 保存私密恢复日志和上一版 Compose，将原配置中唯一的 web.image 改成新 digest，使用 `compose up --no-deps --no-build --pull never --wait` 仅替换 web。原网络、账号、端口 / 挂载继续使用，UGREEN 项目路径仍是原绝对路径。
 5. 最多等待 180 秒健康检查，失败则恢复旧 digest / Compose 并再次检查 healthy。坏 digest 持久阻止重试，避免每 5 分钟反复中断。网络下载失败不会停止旧 Web。
-6. 若更新器进程中断，下一次启动读取 pending.json 并恢复旧 Web；如果用户同时手改了配置，会拒绝覆盖，要求人工处理。更新过程中请勿同时在绿联编辑 / 重新部署这个 Web 项目；只有更新器自身的文件锁，GUI 不遵守它。
+6. 若更新器进程中断，下一次启动读取 pending.json 并恢复旧 Web；如果用户同时手改了配置，会拒绝覆盖，要求人工处理。检查模式也会先处理已有 pending 回退日志，避免把尚未完成的事务当作正常状态。更新过程中请勿同时在绿联编辑 / 重新部署这个 Web 项目；只有更新器自身的文件锁，GUI 不遵守它。
 
 更新会短暂中断 Web，不是零停机；升级后浏览器可刷新获得新页面。健康检查通过不保证全部玩法或数据语义兼容，自动回退也不撤销新版本已写入的业务数据。数据库结构摘要是保守的结构门槛，不是完整的数据兼容性证明；涉及数据含义变化仍需人工发布。现有备份安排继续保留。
 
@@ -47,6 +47,6 @@
 
 ## 验证状态
 
-本地已通过更新器失败 / 恢复 / 配置并发保护测试，CI 将在临时 Docker / PostgreSQL / registry 上测试实际替换和回退，成功记录后再填写正式镜像。NAS 的 socket 兼容性、绿联项目刷新、掉电恢复和真实更新仍需一次现场验收；不能把 CI 通过写成 NAS 已启用。
+本地已通过 11 项更新器失败 / 恢复 / 配置并发保护 / CRLF 保留测试，CI 将在临时 Docker / PostgreSQL / registry 上测试实际替换和回退，成功记录后再填写正式镜像。NAS 的 socket 兼容性、绿联项目刷新、掉电恢复和真实更新仍需一次现场验收；不能把 CI 通过写成 NAS 已启用。
 
 官方命令依据：[Compose up](https://docs.docker.com/reference/cli/docker/compose/up/)、[Compose config](https://docs.docker.com/reference/cli/docker/compose/config/)、[GitHub workflow trigger](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)。

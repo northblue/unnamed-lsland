@@ -48,7 +48,9 @@ docker build --builder default -f "$folder/healthy.Dockerfile" --build-arg MARKE
 docker push "$repository:nas-stable"
 candidate=$(docker image inspect "$repository:nas-stable" --format '{{index .RepoDigests 0}}')
 check() {
-  docker run --rm --network none \
+  docker run --rm --network none --read-only \
+    --cap-drop ALL --cap-add CHOWN --cap-add DAC_OVERRIDE \
+    --security-opt no-new-privileges:true --tmpfs /tmp:rw,noexec,nosuid,size=32m \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -v "$folder:$folder" -v "$folder/state:/state" \
     -e COMPOSE_FILE="$compose" -e PROJECT_NAME="$project" -e SERVICE_NAME=web \

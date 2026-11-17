@@ -141,7 +141,7 @@ class Updater:
         record = json.loads(self.pending.read_text())
         if record["compose"] != str(self.compose) or record["project"] != self.docker.project or record["service"] != self.docker.service:
             raise UpdateError("Recovery journal belongs to another project")
-        if self.compose.read_text() not in [record["before"], record["after"], record.get("original")]:
+        if self.compose.read_bytes().decode('utf-8') not in [record["before"], record["after"], record.get("original")]:
             raise UpdateError("Compose changed externally; review pending recovery before updating")
         atomic_write(self.compose, record["before"])
         self.docker.up()
@@ -156,9 +156,9 @@ class Updater:
     def check(self):
         if self.pending.exists():
             return self.recover()
-        original = self.compose.read_text()
+        original = self.compose.read_bytes().decode('utf-8')
         configuration = self.docker.configuration()
-        if self.compose.read_text() != original:
+        if self.compose.read_bytes().decode('utf-8') != original:
             raise UpdateError("Compose changed while checking configuration")
         service = configuration.get("services", {}).get(self.docker.service)
         if not service or service.get("build"):
@@ -196,7 +196,7 @@ class Updater:
             return "available"
         before = replace_image(original, self.docker.service, previous)
         after = replace_image(original, self.docker.service, candidate)
-        if self.compose.read_text() != original:
+        if self.compose.read_bytes().decode('utf-8') != original:
             raise UpdateError("Compose changed during pull; no update was applied")
         record = {"compose": str(self.compose), "project": self.docker.project, "service": self.docker.service,
                   "original": original, "before": before, "after": after, "previous": previous, "candidate": candidate}

@@ -143,6 +143,20 @@ class UpdaterTests(unittest.TestCase):
             self.updater.check()
         self.assertIn("edited after failure", self.compose.read_text())
 
+    def test_crlf_and_private_quoting_survive_a_real_update(self):
+        self.compose.write_bytes(self.source.replace("\n", "\r\n").encode())
+        self.assertEqual(self.updater.check(), "updated")
+        self.assertEqual(self.compose.read_bytes(), self.source.replace(OLD, NEW).replace("\n", "\r\n").encode())
+
+    def test_recovery_after_journal_write_before_compose_replacement(self):
+        record = {"compose": str(self.compose), "project": self.driver.project, "service": "web",
+                  "original": self.source, "before": self.source, "after": self.source.replace(OLD, NEW),
+                  "previous": OLD, "candidate": NEW}
+        atomic_write(self.updater.pending, json.dumps(record))
+        self.assertEqual(self.updater.check(), "rolled-back")
+        self.assertEqual(self.compose.read_text(), self.source)
+        self.assertFalse(self.updater.pending.exists())
+
     def test_docker_up_is_scoped_without_dependencies_builds_or_pulls(self):
         docker = Docker("unnamed-island", self.compose, "web", 20)
         calls = []

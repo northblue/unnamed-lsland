@@ -9,7 +9,7 @@
 - 新增独立 Python / Docker CLI 更新器，仅对指定 Compose project / web 执行 no-deps / no-build / pull-never 的健康等待更新。先拉后停，原文只替换 image 行并固定 digest；备份 / pending 日志权限 600。失败回退旧版本、坏 digest 阻止重试；中断后恢复，GUI 并发改配置时拒绝覆盖。环境 / image 与运行容器不一致时拒绝更新。
 - Web 镜像新增 PostgreSQL schema / migration 内容摘要标签。旧镜像缺标签须一次人工安装 bootstrap；摘要变化拒绝自动替换，不运行 Prisma 或升级数据库。更新器自身固定 digest，不自动替换自己，不清理全局 Docker 镜像 / 卷。
 - 更新器需 Docker socket 管理权限（实际可控制整个 Docker / 主机，脚本目标限制不是强制隔离）；模板无端口、network none、只读根目录，仅挂 Web 项目绝对目录 / socket / state，明确保留已有凭据。NAS 操作手册 [nas-auto-update.md](nas-auto-update.md) 已准备，尚未启用。
-- 本地 9 项更新 / 失败回退 / 中断恢复 / 配置并发保护等测试、workflow / Compose YAML、shell 语法检查通过；本机没有 Docker daemon。新增 CI 临时 registry + PostgreSQL + Compose 真实替换 / 回退 / 无变化不重启 / 失败阻止验收，实际云端结果与镜像待后续补记；未操作 NAS。
+- 本地 11 项更新 / 失败回退 / 中断恢复 / 配置并发保护 / CRLF 原文保留等测试、workflow / Compose YAML、shell 语法检查通过；本机没有 Docker daemon。新增 CI 临时 registry + PostgreSQL + Compose 真实替换 / 回退 / 无变化不重启 / 失败阻止验收，实际云端结果与镜像待后续补记；未操作 NAS。
 
 ### 2026-11-17 手机专注小岛模式
 
