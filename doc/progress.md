@@ -1,7 +1,16 @@
 # 开发进度
 
-更新：2026-11-17。此处先列当前状态；下方历史记录保留当时的实现与验证范围，后续条目优先，不将旧结论自动视为最新版验收。
+更新：2026-11-18。此处先列当前状态；下方历史记录保留当时的实现与验证范围，后续条目优先，不将旧结论自动视为最新版验收。
 
+
+### 2026-11-18 自动发布与 NAS 更新器验收成功
+
+- 提交 e622ac9d741ea2e28a869d2bc3a2f62a8ce07410 的 push 实际自动触发 [Actions 44170757949](https://github.com/northblue/unnamed-lsland/actions/runs/44170757949)，最终 success。99 项测试（游戏 67 + 服务端 21 + 更新器 11）、Linux Web / tools / updater 构建、临时 PostgreSQL / LAN / 登录 / 保存 / 重启及真实更新 / 回退全部通过。
+- 临时 registry + Compose 的真实验收：旧 Web 健康时先拉取新版，再仅替换目标 Web；健康同版本不重建；故意发布 health 失败镜像，自动恢复上一固定 digest 并恢复 healthy；相同坏 digest 隔离后不重试、不重启；原 PostgreSQL 容器 ID 不变。更新器使用与 NAS 模板相同的只读根目录、network none 与精简 caps 测试。
+- 前几轮 CI 在 registry 频道被重新标记后查询旧镜像失败而阻止发布，没有操作 NAS。真实日志确认正常替换 / 同版不重启已成功，失败发生在后续坏版本阶段。现先显式拉取并保留当前不可变引用，再移动频道，修复 containerd 仅存在可变 tag 时丢失旧引用的问题；最终回退验收成功。保留按固定仓库摘要查询，避免依赖容器 Image ID 的查找。
+- 已匿名核对三镜像的 registry manifest 摘要、linux/amd64，Web 的 schema / migration 兼容摘要与源码一致；nas-stable 实际解析为同一已验证 Web digest。正式版本见 deploy/island/release.json、deploy/auto-update/release.json，旧 Web 版本已留档；更新器固定 digest，不跟随频道自行替换。
+- 正式配置包 deploy/unnamed-island-auto-update.zip 只含更新器 Compose、WEB-IMAGE.txt、release.json 和说明；无真实环境、Token、存档或数据库。NAS 还需用户在绿联一次性更换 bootstrap Web 镜像，再建立 unnamed-island-updater 项目；未实际挂载 NAS socket、修改 NAS 项目 / 密码 / 端口或执行数据库迁移。
+- 未验收：UGREEN 现场 socket / Compose 兼容与项目 UI 刷新、真实掉电恢复、NAS 自动更新和人工回滚操作。健康回退不撤销已写入的数据，schema 摘要不是所有业务语义的兼容证明。手册明确 Docker socket 的实际管理权限、私密恢复文件和维护边界。
 
 ### 2026-11-17 自动构建与 NAS 更新准备
 

@@ -1,8 +1,9 @@
 # A SEPARATE UGREEN project: unnamed-island-updater. No passwords belong here.
-# The published setup package replaces the image placeholder with a verified digest.
+# Verified updater pinned by digest; application updates use the stable channel.
+version: '3.8'
 services:
   updater:
-    image: ghcr.io/northblue/unnamed-island:updater-setup-required
+    image: ghcr.io/northblue/unnamed-island@sha256:b18268cbf7c42a6006c68839a1e9b2a7e9ee53b78697b7297caabc53358f3938
     platform: linux/amd64
     restart: unless-stopped
     user: '0:0'

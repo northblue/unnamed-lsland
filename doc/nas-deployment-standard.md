@@ -140,7 +140,7 @@ repository/
 
 建议规则：main 提交执行检查；明确发布版本标签（例如 v0.1.0）后构建和发布镜像。生产 Compose 引用固定版本 / commit SHA，重要发布可锁定镜像 digest，避免靠 latest 推断运行版本。
 
-初期先用 UGREEN 项目界面手动更新，流程稳定后再加自动部署。CI 负责构建，不要求在 NAS 安装 CI runner。
+无名岛现已准备 main 推送触发构建、nas-stable 频道与独立更新器，详见 [自动更新](nas-auto-update.md)；NAS 尚需一次性导入 / 验收。其他项目仍先用 UGREEN 项目界面手动部署，验证后复用这一模式。CI 负责构建，不要求在 NAS 安装 CI runner。
 
 每次更新顺序：
 

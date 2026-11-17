@@ -1,3 +1,5 @@
+> 自动更新：main 源码推送现自动验收并发布 nas-stable，NAS 还需一次性导入独立更新器；见 [操作手册](../../doc/nas-auto-update.md)。
+
 > 公网共享密码版本：见 [部署说明](../../doc/nas-public-access.md) 和 `compose.public.ugreen.yaml`；实际新镜像状态以 release.json / progress.md 为准。
 
 # Unnamed Island NAS container templates

@@ -1,6 +1,6 @@
 # 小岛自动发布与 NAS 更新
 
-更新：2026-11-17。目标：Mac 推送 main → GitHub 测试和构建 → 发布 nas-stable → NAS 每 5 分钟检查，仅更新小岛 Web。NAS 不需要 GitHub Token、Git、Node、源码或本地构建。
+更新：2026-11-18。目标：Mac 推送 main → GitHub 测试和构建 → 发布 nas-stable → NAS 每 5 分钟检查，仅更新小岛 Web。NAS 不需要 GitHub Token、Git、Node、源码或本地构建。
 
 ## 发布规则
 
@@ -29,7 +29,7 @@
 ## 每次更新做什么
 
 1. 要求现有 Web 是 healthy；校验保存的配置与实际容器的 image / 显式 environment 一致。GUI 修改了配置却还没部署时拒绝自动更新。
-2. 在旧 Web 继续运行时拉取 nas-stable，并解析固定 digest。已是同一镜像时不重启。
+2. 在旧 Web 继续运行时先显式保留当前固定 digest 的本地镜像引用，再拉取 nas-stable 并解析新 digest，避免频道重新标记时丢失旧引用。已是同一镜像时不重启。
 3. 比较当前 / 新镜像的 PostgreSQL schema 与 migration 文件内容摘要。不同则记录 `MANUAL MIGRATION REQUIRED`，保留旧 Web，等待人工备份 / 迁移 / 更新。它不自动运行 Prisma、不更新 PostgreSQL 容器。
 4. 保存私密恢复日志和上一版 Compose，将原配置中唯一的 web.image 改成新 digest，使用 `compose up --no-deps --no-build --pull never --wait` 仅替换 web。原网络、账号、端口 / 挂载继续使用，UGREEN 项目路径仍是原绝对路径。
 5. 最多等待 180 秒健康检查，失败则恢复旧 digest / Compose 并再次检查 healthy。坏 digest 持久阻止重试，避免每 5 分钟反复中断。网络下载失败不会停止旧 Web。
@@ -47,6 +47,8 @@
 
 ## 验证状态
 
-本地已通过 11 项更新器失败 / 恢复 / 配置并发保护 / CRLF 保留测试，CI 将在临时 Docker / PostgreSQL / registry 上测试实际替换和回退，成功记录后再填写正式镜像。NAS 的 socket 兼容性、绿联项目刷新、掉电恢复和真实更新仍需一次现场验收；不能把 CI 通过写成 NAS 已启用。
+本地 11 项更新器测试通过；[Actions 44170757949](https://github.com/northblue/unnamed-lsland/actions/runs/44170757949) 由 push 自动触发并成功，包含 99 项测试、三镜像构建和临时 Docker / PostgreSQL / registry 真实替换、同版不重启、坏版本健康失败回退、坏 digest 阻止和数据库容器不变检查。三镜像摘要 / linux/amd64 / 匿名拉取与 nas-stable 解析结果已实际核对，正式固定版本见配置包 release.json。
+
+NAS 的 socket 兼容性、绿联项目刷新、掉电恢复和真实更新仍需一次现场验收；尚未在 NAS 启用。第一次先安装 WEB-IMAGE.txt 的 Web，再导入独立更新器，不要只换旧 Web 为 nas-stable 标签。
 
 官方命令依据：[Compose up](https://docs.docker.com/reference/cli/docker/compose/up/)、[Compose config](https://docs.docker.com/reference/cli/docker/compose/config/)、[GitHub workflow trigger](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)。

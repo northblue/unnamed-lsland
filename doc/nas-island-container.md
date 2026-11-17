@@ -1,14 +1,16 @@
+> 2026-11-18：发布流程现支持 main 源码 push 自动构建 / 验收 / 发布，NAS 一次性配置更新器后定时更新；见 [自动发布与更新](nas-auto-update.md)。下方早期 GitHub 手动操作部分仅作历史参考。
+
 # 小岛独立容器与镜像发布
 
-更新：2026-11-16。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；已由 Actions 43716616878 发布 Web / tools 镜像，摘要与 linux/amd64 架构及匿名拉取已核对；用户随后已在 NAS 启动 Web / tools，完成基线迁移且 health 200；旧岛导入与独立核对、局域网首页 / health / 存档 HTTP 200 已完成。共享密码与公网发布按 [最新入口说明](nas-public-access.md) 操作。
+更新：2026-11-18。用户指定代码仓库 https://github.com/northblue/unnamed-lsland；仓库名保留 lsland，应用正式名仍是 unnamed-island。部署文件准备完成后，已按用户授权初始化 Git main 并将首次提交 42537de 推送到该仓库；推送前远端没有分支 / 标签。现有仓库根包含 code/、doc/、deploy/ 和 .github/，与 workflow 路径一致。已完成仅验证 Actions，修复容器 Host 校验及测试请求后，第三次运行 43716023910 全部通过（提交 22ccece）；已由 Actions 43716616878 发布 Web / tools 镜像，摘要与 linux/amd64 架构及匿名拉取已核对；用户随后已在 NAS 启动 Web / tools，完成基线迁移且 health 200；旧岛导入与独立核对、局域网首页 / health / 存档 HTTP 200 已完成。共享密码与公网发布按 [最新入口说明](nas-public-access.md) 操作。
 
 ## 当前已发布版本
 
-- 来源提交：`d0d3e201e33f3b2449863175eab850aa032fee57`（手机专注模式、共享密码、PUBLIC_ORIGIN、LAN）。
-- [Actions 44064151022](https://github.com/northblue/unnamed-lsland/actions/runs/44064151022) publish=true / success：88 项测试、数据库 / 保存 / LAN / 认证 / 重启和缺配置拒绝访问验收通过，Web / tools 上传成功。
+- 来源提交：`e622ac9d741ea2e28a869d2bc3a2f62a8ce07410`（自动构建、数据库兼容标记、手机专注模式、共享密码）。
+- [Actions 44170757949](https://github.com/northblue/unnamed-lsland/actions/runs/44170757949) push 自动触发 / success：99 项测试、数据库 / 保存 / LAN / 认证 / 重启和缺配置拒绝访问验收通过，Web / tools / updater 上传成功，nas-stable 已核对。
 - [release.json](../deploy/island/release.json) 记录不可变镜像摘要和完整 SHA 标签；实际 registry manifest 摘要、linux/amd64 与匿名拉取均已核对。四份 Compose 已更新固定摘要，真实密码 / DATABASE_URL 保持为空。
 - [绿联配置包](../deploy/unnamed-island-nas.zip) 包含基础 / LAN / 共享密码 / tools 四份模板和说明。密码版用 compose.public.ugreen.yaml，更新现有 Web，保留其 DATABASE_URL，按 [公网入口说明](nas-public-access.md) 填写私密密码 / 密钥。
-- 上一 LAN 版本 440addd 已在 NAS 运行、旧岛导入和 HTTP 读取已验证；共享密码基线 5b969c1 已部署，公网未登录跳转已实测；本次手机界面镜像尚未部署到 NAS。历史版本保留在 deploy/island/releases/。
+- 上一 LAN 版本 440addd 已在 NAS 运行、旧岛导入和 HTTP 读取已验证；共享密码基线 5b969c1 已部署，公网未登录跳转已实测；本次 bootstrap Web / 自动更新器尚未在 NAS 安装。历史版本保留在 deploy/island/releases/。
 
 ## 文件与边界
 
@@ -19,13 +21,13 @@
 - deploy/island/compose.tools.ugreen.yaml：可选临时维护项目，默认只查询迁移状态并退出；尚未部署。
 - .github/workflows/island-image.yml：放在整个项目仓库根目录，构建上下文为 code/。如果远端仅有应用根目录，需要先调整目录对应关系，不能照搬路径启动。
 
-## GitHub 网页步骤（尚未执行）
+## 首次手动发布步骤（历史，现用自动发布）
 
 1. 先核对仓库目录是否为 code/、doc/、deploy/；提交本轮代码和 workflow。不要上传 .env、.wrangler、node_modules 或 NAS 数据 / 密码。
 2. 在 Actions 允许 workflow 运行；打开 “Build and verify island image” → Run workflow。第一次保留 publish=false，仅构建验收。
 3. CI 构建 linux/amd64 的 Web / tools 镜像，启动一次性 PostgreSQL 17、运行基线迁移；验证页面 / JS / GLB 资源、health、存档读写 / 校验 / Origin 拒绝 / 并发 revision、重启后存档保留。测试库用固定的 CI 测试密码，不是 NAS 密码，任务结束移除容器与网络。
 4. 首次验证通过后，再 Run workflow 勾选 publish=true，使用 GITHUB_TOKEN 发布到 GHCR，权限为 contents:read / packages:write；不需要给 CI NAS 密码。私有仓库或组织策略可能需允许包写入 / Actions。
-5. 镜像为 ghcr.io/northblue/unnamed-island:sha-完整提交SHA，维护镜像同标签加 -tools。两个镜像均通过验证后发布；不用 latest 自动更新。记录镜像 digest，NAS 可改用 digest 固定内容。workflow 是手动触发，不会自动更新 NAS，也不把镜像改成公开。
+5. 镜像为 ghcr.io/northblue/unnamed-island:sha-完整提交SHA，维护镜像同标签加 -tools。两个镜像均通过验证后发布；不用 latest 自动更新。记录镜像 digest，NAS 可改用 digest 固定内容。这是早期手动流程；当前 main 源码推送会自动触发验收和发布，NAS 安装独立更新器后才会自动更新。
 
 私有 GHCR 镜像需要在绿联配置拉取凭据（具 read:packages 的专用令牌，必要时组织授权）；不把令牌写进 Compose、发送到聊天或提交仓库。若包公开，镜像内代码也可被任何人读取，需由用户选择可见性。数据库密码从不进入构建。
 
