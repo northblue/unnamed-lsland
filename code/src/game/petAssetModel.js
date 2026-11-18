@@ -33,8 +33,11 @@ export function preparePetAsset(gltf, kind) {
       if (clip.name === 'Sleep' || clip.name === 'Sit') { action.setLoop(THREE.LoopOnce, 1); action.clampWhenFinished = true; }
       actions[clip.name] = action; weights[clip.name] = 0;
     }
+    const face = model.getObjectByName('head'), paw = model.getObjectByName('front_leg_upper_l'), gesture = new THREE.Quaternion(), axis = new THREE.Vector3(0, 0, 1);
+    const faceBase = face.quaternion.clone(), pawBase = paw.quaternion.clone();
     let previous, active;
-    const instance = { root, update(time, { moving = false, resting = false, playful = false, reduceMotion = false, motionTime = time } = {}) {
+    const instance = { root, update(time, { moving = false, resting = false, playful = false, interaction = 'none', reduceMotion = false, motionTime = time } = {}) {
+      face.quaternion.copy(faceBase); paw.quaternion.copy(pawBase);
       const dt = previous === undefined ? 0 : Math.max(0, Math.min(0.1, motionTime - previous)); previous = motionTime;
       const target = reduceMotion ? 'Idle' : resting ? variant % 2 ? 'Sit' : 'Sleep' : moving ? playful ? 'Run' : 'Walk' : playful ? 'Play Bow' : 'Idle';
       if (active !== target) { actions[target]?.reset().play(); active = target; }
@@ -43,6 +46,9 @@ export function preparePetAsset(gltf, kind) {
         weights[name] = THREE.MathUtils.lerp(weights[name], name === target ? 1 : 0, blend); action.setEffectiveWeight(weights[name]);
       }
       if (reduceMotion) { actions.Idle.time = 0; mixer.update(0); } else mixer.update(dt);
+      faceBase.copy(face.quaternion); pawBase.copy(paw.quaternion);
+      if (!reduceMotion && !moving && interaction === 'sniff') face.quaternion.multiply(gesture.setFromAxisAngle(axis, Math.sin(motionTime * 3) * 0.09));
+      if (!reduceMotion && !moving && interaction === 'paw') paw.quaternion.multiply(gesture.setFromAxisAngle(axis, 0.3 + Math.sin(motionTime * 4) * 0.16));
     }, dispose() { mixer.stopAllAction(); mixer.uncacheRoot(model); root.removeFromParent(); ownMaterials.forEach(m => m.dispose()); instances.delete(instance); } };
     instances.add(instance); instance.update(0); return instance;
   }, dispose() { [...instances].forEach(v => v.dispose()); geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); textures.forEach(t => { t.source?.data?.close?.(); t.dispose(); }); } };

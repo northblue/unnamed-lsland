@@ -87,6 +87,8 @@ export function createIslandLandmarks(scene) {
   for (const dx of [-0.83, 0.83]) mesh(new THREE.BoxGeometry(0.045, 1.04, 0.07), ivory, COURT.x + dx, COURT.y + 3.1, boardZ);
   for (const dy of [-0.51, 0.51]) mesh(new THREE.BoxGeometry(1.7, 0.045, 0.07), ivory, COURT.x, COURT.y + 3.1 + dy, boardZ);
   const rim = mesh(new THREE.TorusGeometry(0.29, 0.032, 8, 32), standard('#d77b43'), COURT.x, COURT.y + 2.88, rimZ); rim.rotation.x = Math.PI / 2;
+  rim.name = 'basketball-hoop';
+  const hoopAnchor = new THREE.Object3D(); hoopAnchor.name = 'basketball-hoop'; hoopAnchor.position.copy(rim.position); root.add(hoopAnchor);
   const netPositions = [];
   for (let i = 0; i < 14; i++) for (let j = 0; j < 4; j++) {
     const a = i / 14 * Math.PI * 2 + j * 0.1, b = a + 0.21;
@@ -95,6 +97,7 @@ export function createIslandLandmarks(scene) {
   const netGeometry = new THREE.BufferGeometry(); netGeometry.setAttribute('position', new THREE.Float32BufferAttribute(netPositions, 3)); geometries.add(netGeometry);
   const netMaterial = new THREE.LineBasicMaterial({ color: '#f6efda' }); materials.add(netMaterial); root.add(new THREE.LineSegments(netGeometry, netMaterial));
   const basketball = mesh(new THREE.SphereGeometry(0.25, 20, 14), standard('#cd7a3f'), COURT.x + 1.1, COURT.y + 0.25, COURT.z + 1.3);
+  basketball.name = 'interactive-basketball'; basketball.scale.setScalar(0.64);
   const seam = standard('#684a35');
   for (let i = 0; i < 3; i++) { const band = mesh(new THREE.TorusGeometry(0.252, 0.007, 5, 40), seam, 0, 0, 0, basketball); band.rotation.set(i * Math.PI / 2, i * 0.6, 0); }
 
@@ -134,8 +137,8 @@ export function createIslandLandmarks(scene) {
   root.updateMatrixWorld(true);
   const buckets = new Map(), inverse = root.matrixWorld.clone().invert(), staticMeshes = [];
   root.traverse(object => {
-    if (!object.isMesh || object.isInstancedMesh) return;
-    for (let parent = object.parent; parent && parent !== root; parent = parent.parent) if (parent === head) return;
+    if (!object.isMesh || object.isInstancedMesh || object === basketball) return;
+    for (let parent = object.parent; parent && parent !== root; parent = parent.parent) if (parent === head || parent === basketball) return;
     staticMeshes.push(object);
   });
   for (const object of staticMeshes) {
@@ -151,7 +154,7 @@ export function createIslandLandmarks(scene) {
   const origin = { x: SUNFLOWER.x, y: flower.position.y + 5.15 * flower.scale.y, z: SUNFLOWER.z };
   const normal = new THREE.Vector3(), front = new THREE.Vector3(0, 0, 1), targetRotation = new THREE.Quaternion(), wind = new THREE.Quaternion();
   let initialized = false;
-  return { root, update(time, reduceMotion = false, cycle = dayCycleAt(12), dt = 0.04) {
+  return { root, ball: basketball, update(time, reduceMotion = false, cycle = dayCycleAt(12), dt = 0.04) {
     const pose = sunflowerPose(cycle, origin);
     normal.set(pose.direction.x, pose.direction.y, pose.direction.z);
     targetRotation.setFromUnitVectors(front, normal);

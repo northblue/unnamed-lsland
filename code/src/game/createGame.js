@@ -8,6 +8,7 @@ import { createIslandState, validateIslandState } from './islandState.js';
 import { createWater } from './water.js';
 import { createDayClock, localHour, solarPositionAt } from './dayCycle.js';
 import { createJumpState, startJump, stepJump } from './jump.js';
+import { createBasketballState, canPickUpBall, toggleBall, shootBall, stepBasketball, basketballHud, HOOP } from './basketball.js';
 import { createSky } from './sky.js';
 import { createClouds } from './clouds.js';
 import { createSkyVolume } from './skyVolume.js';
@@ -41,6 +42,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
   let pond = { ...initial.pond };
   const fishing = createFishingState();
   const jump = createJumpState();
+  const basketball = createBasketballState();
   const construction = { buildings: [] };
   let buildingMode = false;
   let buildNoticeUntil = 0;
@@ -150,7 +152,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     }
   }
   function setBuilding(enabled) {
-    if (enabled) cancelFishing();
+    if (enabled) { cancelFishing(); if (basketball.phase === 'held') toggleBall(basketball, player.position); }
     const missing = hutMaterialsMissing(gathering);
     // Never trap a player in placement mode before they can afford the recipe.
     if (enabled && (missing.wood || missing.stone)) enabled = false;
@@ -165,8 +167,21 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     container.focus({ preventScroll: true });
   }
   function cancelFishing() { Object.assign(fishing, createFishingState()); }
+  function toggleBasketball() {
+    if (paused || buildingMode || ['waiting', 'caught'].includes(fishing.phase)) return;
+    if (toggleBall(basketball, player.position)) cancelFishing();
+    container.focus({ preventScroll: true });
+  }
+  function shootBasketball() {
+    if (paused || buildingMode || ['waiting', 'caught'].includes(fishing.phase)) return;
+    if (shootBall(basketball, player.position, { moving: [...accepted].some(key => keys.has(key)), airborne: !jump.grounded })) {
+      cancelFishing(); player.rotation.y = Math.atan2(player.position.x - HOOP.x, player.position.z - HOOP.z);
+    }
+    container.focus({ preventScroll: true });
+  }
   function toggleFishing() {
     if (paused) return;
+    if (basketball.phase === 'held') toggleBall(basketball, player.position);
     if (fishing.phase !== 'idle') cancelFishing();
     else { setBuilding(false); fishing.phase = 'aim'; }
     clear(); container.focus({ preventScroll: true });
@@ -366,6 +381,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     if (paused) return;
     if (e.code === 'Escape' && buildingMode) { e.preventDefault(); setBuilding(false); return; }
     if (e.target?.closest?.('input, textarea, select, button, [contenteditable="true"]') || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.code === 'KeyG') { e.preventDefault(); if (!e.repeat) shootBasketball(); return; }
     if (e.code === 'Space') {
       e.preventDefault();
       if (!e.repeat && !keys.has(e.code) && !buildingMode && !['waiting', 'caught'].includes(fishing.phase)) startJump(jump);
@@ -479,10 +495,14 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
       stepJump(jump, paused ? 0 : dt);
       player.position.y = terrainHeight(player.position.x, player.position.z) + jump.height
         + (walking && jump.grounded && !reduceMotion.matches ? Math.sin(elapsed * 16) * 0.035 : 0);
-      playerModel.update(waterTime,{moving:Boolean(walking),jumping:!jump.grounded,fishing:fishing.phase!=='idle',reduceMotion:reduceMotion.matches});
+      playerModel.update(waterTime,{moving:Boolean(walking),jumping:!jump.grounded,carrying:basketball.phase==='held',shooting:basketball.time<basketball.releaseUntil,fishing:fishing.phase!=='idle',reduceMotion:reduceMotion.matches});
+      stepBasketball(basketball, paused ? 0 : dt, player.position, { heading: player.rotation.y, moving: Boolean(walking), airborne: !jump.grounded });
+      landmarks.ball.position.set(basketball.ball.x, basketball.ball.y, basketball.ball.z);
+      if (!paused && basketball.phase !== 'ground' && !reduceMotion.matches) landmarks.ball.rotation.z += dt * 4;
       fishingView.update(fishing, player.position, waterTime, water.surfaceHeight, reduceMotion.matches, playerModel.gripPosition());
       while (pendingInteractions > 0) {
         pendingInteractions -= 1;
+        if (basketball.phase === 'held' || canPickUpBall(basketball, player.position)) { toggleBasketball(); continue; }
         const drift=nearbyDriftwood(drifting,player.position);
         if(drift){salvage(drift.id);continue;}
         const result = gatherResource(gathering, player.position);
@@ -510,6 +530,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
       }
       updateGhost();
       const hud = {
+        basketball: basketballHud(basketball, player.position),
         supplies: { nearby: nearbyDriftwood(drifting,player.position)?.kind ?? null,
           notice: now<salvageNoticeUntil ? salvageNotice : null,
           growing: gathering.resources.filter(r=>r.type==='wood' && r.remaining===0 && !treeCovered(r,construction.buildings)).length },
@@ -544,6 +565,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
   });
 
   return {
+    toggleBasketball, shootBasketball,
     setAmbience: (enabled) => ambience.setEnabled(enabled),
     setLanguage:language=>sky.setLanguage(language),
     setTimePreview: (hour) => dayClock.setPreview(hour),

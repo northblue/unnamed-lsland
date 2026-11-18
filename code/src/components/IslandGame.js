@@ -268,6 +268,12 @@ export default function IslandGame() {
     <div className="gather-feedback" role="status">
       {hud.built ? <span>{text.built}</span> : hud.collected && <span key={hud.feedbackSequence}>{text.collected[hud.collected]}</span>}
     </div>
+    {status === 'ready' && hud.basketball?.visible && <section className="basketball-card" aria-label={text.basketball.title}>
+      <strong>{text.basketball.title}</strong><span>{text.basketball.score.replace('{makes}', hud.basketball.makes).replace('{shots}', hud.basketball.shots)}</span>
+      <p aria-live="polite">{hud.basketball.result ? text.basketball[hud.basketball.result] : hud.basketball.held ? (hud.basketball.canShoot ? text.basketball.held : text.basketball.range) : hud.basketball.flying ? text.basketball.flying : text.basketball.find}</p>
+      <div><button type="button" disabled={hud.buildingMode || (!hud.basketball.held && !hud.basketball.canPickup)} onClick={() => gameRef.current?.toggleBasketball()}>{hud.basketball.held ? text.basketball.drop : text.basketball.pickup}</button>
+      <button type="button" disabled={hud.buildingMode || !hud.basketball.canShoot} onClick={() => gameRef.current?.shootBasketball()}>{text.basketball.shoot}</button></div>
+    </section>}
     {status === 'databaseError' && <div className="database-error" role="alert"><h2>{text.storageErrors.databaseUnavailable}</h2><p>{text.databaseSetupHelp}</p><button type="button" onClick={() => window.location.reload()}>{text.retryLoad}</button> <button type="button" onClick={() => setOffline(true)}>{text.playOffline}</button></div>}
     {manager && <IslandManager initial={manager} text={text} onSave={saveManager} onClose={closeManager} />}
     <footer><span className="status" role="status">{text.status[status]}</span><span>{text.prototype}</span></footer>

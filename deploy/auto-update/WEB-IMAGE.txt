@@ -1,1 +1,1 @@
-    image: ghcr.io/northblue/unnamed-island@sha256:36e7dee5f8487fe6710b0d91556793f87a8a3b0dfb500b2db1417155c1dccbd0
+    image: ghcr.io/northblue/unnamed-island@sha256:3df2176c84ce71bd46dc51cda0d50257d2026d651bb7469790c12192d8dabf83

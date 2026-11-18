@@ -23,7 +23,7 @@ export function createPets(scene, { modelLoader = typeof window === 'undefined' 
         const view = views[i], playful = pet.mode === 'play' || pet.mode === 'chase';
         view.root.position.set(pet.x, terrainHeight(pet.x, pet.z) + (playful && pet.moving && !reduceMotion ? Math.max(0, Math.sin(pet.phase * 0.5)) * 0.08 : 0), pet.z);
         view.root.rotation.y = pet.heading;
-        view.update(pet.phase, { moving: pet.moving, resting: pet.mode === 'rest', playful, reduceMotion, motionTime: state.time });
+        view.update(pet.phase, { moving: pet.moving, resting: pet.mode === 'rest', playful, interaction: pet.interaction, reduceMotion, motionTime: state.time });
       });
     },
     dispose() { disposed = true; root.removeFromParent(); views.forEach(view => view.dispose()); imported?.dispose(); },

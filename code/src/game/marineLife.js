@@ -5,6 +5,7 @@ import { FISH_KINDS, FISH_COLORS } from './fishing.js';
 import { loadMarineModels } from './marineModels.js';
 import { createSealModel } from './sealModel.js';
 import { whalePose } from './whaleBehaviour.js';
+import { whaleBreath, createWhaleSpout } from './whaleSpout.js';
 import { isLand } from './world.js';
 
 export function createMarineLife(parent, outerRadius, {
@@ -18,6 +19,7 @@ export function createMarineLife(parent, outerRadius, {
   const group = new THREE.Group();
   group.name = 'ocean-visitors';
   parent.add(group);
+  const spout = createWhaleSpout(group), blowhole = new THREE.Vector3();
   const sphere = new THREE.SphereGeometry(1, 12, 8);
   const cone = new THREE.ConeGeometry(1, 1, 3);
   const materials = new Map();
@@ -80,6 +82,7 @@ export function createMarineLife(parent, outerRadius, {
     }
     return { root, tail, arms: [] };
   }
+  const extraGeometry = [];
   function octopus() {
     const root = new THREE.Group();
     oval(root, '#ce8a9f', 0, 0.16, 0, 0.48, 0.48, 0.43);
@@ -88,11 +91,33 @@ export function createMarineLife(parent, outerRadius, {
     for (let i = 0; i < 8; i++) {
       const arm = new THREE.Group();
       arm.rotation.y = i / 8 * Math.PI * 2;
-      oval(arm, '#ce8a9f', 0.42, -0.18, 0, 0.48, 0.1, 0.12);
-      oval(arm, '#e6b0bd', 0.78, -0.12, 0, 0.22, 0.09, 0.1);
+      const points = Array.from({ length: 9 }, (_, j) => {
+        const t = j / 8; return new THREE.Vector3(0.25 + t * 0.85, -0.22 - Math.sin(t * Math.PI) * 0.18 + t * t * 0.24, Math.sin(t * 3) * 0.09);
+      });
+      const geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 14, 0.065, 6, false);
+      extraGeometry.push(geometry); arm.add(new THREE.Mesh(geometry, material('#ce8a9f')));
+      for (let j = 0; j < 4; j++) oval(arm, '#f1c6cc', 0.4 + j * 0.17, -0.34, 0, 0.045, 0.025, 0.045);
       root.add(arm); arms.push(arm);
     }
     return { root, tail: null, arms };
+  }
+
+  function seahorse() {
+    const root = new THREE.Group(), tail = new THREE.Group(), fins = [];
+    oval(root, '#e6b866', 0, -0.04, 0, 0.17, 0.36, 0.12);
+    oval(root, '#f2d38a', 0.03, 0.3, 0, 0.12, 0.24, 0.1);
+    oval(root, '#e6b866', 0.1, 0.47, 0, 0.17, 0.12, 0.11);
+    oval(root, '#f2d38a', 0.27, 0.44, 0, 0.14, 0.045, 0.045);
+    eyes(root, 0.14, 0.51, 0.085, 0.038);
+    for (let i = 0; i < 6; i++) oval(root, '#c89248', -0.11, 0.2 - i * 0.095, 0, 0.065, 0.025, 0.13);
+    const points = Array.from({ length: 25 }, (_, i) => {
+      const t = i / 24, angle = t * Math.PI * 2.1, radius = 0.22 * (1 - t * 0.7);
+      return new THREE.Vector3(-0.08 - Math.sin(angle) * radius, -0.36 - t * 0.2 - (1 - Math.cos(angle)) * radius, 0);
+    });
+    const geometry = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 28, 0.035, 6, false);
+    extraGeometry.push(geometry); tail.add(new THREE.Mesh(geometry, material('#e6b866'))); root.add(tail);
+    const fin = oval(root, '#f5dbab', -0.18, 0.02, 0, 0.12, 0.17, 0.025); fins.push(fin);
+    return { root, tail, arms: fins };
   }
 
   const schools = [];
@@ -119,10 +144,12 @@ export function createMarineLife(parent, outerRadius, {
   const visitors = [
     { ...cetacean(false), lane: outerRadius * 0.868, duration: 34, start: -14, depth: -1.1, kind: 'whale', breach: true },
     { ...cetacean(true), lane: outerRadius * 0.78, duration: 26, start: -3, depth: -0.6, kind: 'dolphin' },
-    { ...octopus(), lane: outerRadius * 0.722, duration: 32, start: -10, depth: -0.9, kind: 'octopus' },
+    { ...octopus(), lane: outerRadius * 0.722, duration: 48, start: -10, depth: -0.85, kind: 'octopus' },
+    { ...seahorse(), lane: outerRadius * 0.74, duration: 65, start: -18, depth: -0.85, kind: 'seahorse' },
+    { ...seahorse(), lane: outerRadius * 0.79, duration: 72, start: -30, depth: -1.0, kind: 'seahorse-small' },
     { ...seal, tail: null, arms: [], lane: outerRadius * 0.81, duration: 31, start: -9, depth: -0.43, kind: 'seal' },
   ];
-  visitors.forEach((view) => { view.root.name = `visitor:${view.kind}`; view.root.rotation.order = 'YXZ'; view.route = visitorPassage(view.lane); group.add(view.root); });
+  visitors.forEach((view) => { if (view.kind === 'seahorse-small') view.root.scale.setScalar(0.8); view.root.name = `visitor:${view.kind}`; view.root.rotation.order = 'YXZ'; view.route = visitorPassage(view.lane); group.add(view.root); });
   if (marineModelLoader) Promise.resolve().then(() => marineModelLoader(clipAtBoundary)).then(template => {
     if (disposed) { template.dispose(); return; }
     marineTemplate = template;
@@ -157,6 +184,7 @@ export function createMarineLife(parent, outerRadius, {
       return { id: member.id, kind: member.kind };
     },
     update(time, reduceMotion = false) {
+      spout.root.visible = false;
       for (const school of schools) {
         let progress = (time - school.start) / school.route.duration;
         if (progress > 1.1) { school.start = time + 1 + Math.random() * 4; school.route = createPassage(outerRadius); school.members.forEach((member) => { member.caught = false; }); progress = -1; }
@@ -186,8 +214,13 @@ export function createMarineLife(parent, outerRadius, {
         visitor.root.visible = !isLand(p.x, p.z, -2.5);
         if (!visitor.root.visible) continue;
         const pose = whalePose(progress, visitor.duration, visitor.kind === 'whale' && visitor.breach, reduceMotion);
-        visitor.root.position.set(p.x, visitor.depth + (reduceMotion ? 0 : Math.sin(time * 2) * 0.07) + pose.lift, p.z);
+        const breath = visitor.kind === 'whale' ? whaleBreath(progress, visitor.duration, reduceMotion) : { lift: 0, sprayAge: -1 };
+        visitor.root.position.set(p.x, visitor.depth + (reduceMotion ? 0 : Math.sin(time * 2) * 0.07) + pose.lift + breath.lift, p.z);
         visitor.root.rotation.set(pose.roll, p.heading, pose.pitch);
+        if (visitor.kind === 'whale' && breath.sprayAge >= 0) {
+          blowhole.set(0.95, 0.58, 0); visitor.root.localToWorld(blowhole);
+          if (Math.hypot(blowhole.x, blowhole.z) < outerRadius - 1) spout.update(blowhole, breath.sprayAge, reduceMotion);
+        }
         const swimDt = Math.max(0, Math.min(0.1, time - (visitor.lastSwimUpdate ?? time)));
         visitor.lastSwimUpdate = time;
         visitor.swimTime = (visitor.swimTime ?? 0) + (reduceMotion ? 0 : swimDt * (pose.active ? 1.5 : 0.85));
@@ -204,7 +237,7 @@ export function createMarineLife(parent, outerRadius, {
     dispose() {
       disposed = true;
       importedViews.forEach(view => view.dispose()); importedTemplate?.dispose();
-      marineTemplate?.dispose(); seal.dispose();
+      marineTemplate?.dispose(); seal.dispose(); spout.dispose(); extraGeometry.forEach(g => g.dispose());
       group.removeFromParent(); sphere.dispose(); cone.dispose();
       materials.forEach((value) => value.dispose());
     },

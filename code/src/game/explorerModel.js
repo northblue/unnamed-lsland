@@ -77,13 +77,13 @@ export function createExplorerModel() {
   }
   let lastTime,motion=0;
   return {root,
-    update(time,{moving=false,fishing=false,jumping=false,reduceMotion=false}={}){
+    update(time,{moving=false,fishing=false,jumping=false,carrying=false,shooting=false,reduceMotion=false}={}){
       const dt=lastTime===undefined?0:Math.min(0.1,Math.abs(time-lastTime));lastTime=time;
       motion=reduceMotion?0:THREE.MathUtils.lerp(motion,moving?1:0,1-Math.exp(-dt*14));
       legs.forEach(({leg,knee},i)=>{const step=Math.sin(time*10+i*Math.PI);leg.rotation.x=jumping?0.22:step*0.48*motion;knee.rotation.x=jumping?-0.65:-Math.max(0,-step)*0.55*motion;});
       arms.forEach(({arm,elbow},i)=>{
-        arm.rotation.x=jumping?-0.65:fishing?0.95:-Math.sin(time*10+i*Math.PI)*0.38*motion;
-        elbow.rotation.x=fishing?0.95:0.07+Math.max(0,Math.sin(time*10+i*Math.PI))*0.18*motion;
+        arm.rotation.x=shooting?2.1:jumping?-0.65:fishing?0.95:carrying&&i===1?0.35+Math.sin(time*10)*0.18*motion:-Math.sin(time*10+i*Math.PI)*0.38*motion;
+        elbow.rotation.x=shooting?0.25:fishing?0.95:carrying&&i===1?0.4:0.07+Math.max(0,Math.sin(time*10+i*Math.PI))*0.18*motion;
         arm.rotation.y=fishing?(i?0.45:-0.45):0;
       });
       head.rotation.y=reduceMotion||moving||fishing||jumping?0:Math.sin(time*0.45)*0.045;

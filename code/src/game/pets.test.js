@@ -41,3 +41,38 @@ test('pet view cleanup removes companions without creating persistent gameplay f
   assert.ok(pets.state.pets.every(p => canWalk(p.x, p.z)));
   pets.dispose(); assert.equal(scene.children.length, 0);
 });
+
+test('companions travel beyond the court and meet, sniff, chase, play and rest with changing partners', () => {
+  let seed = 42; const random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  const state = createPetState({ random }), gestures = new Set(), partners = state.pets.map(() => new Set());
+  const visits = state.pets.map(() => ({ minX: Infinity, minZ: Infinity, maxX: -Infinity }));
+  for (let i = 0; i < 15000; i++) {
+    stepPets(state, 0.04);
+    state.pets.forEach((p, j) => {
+      assert.ok(canWalk(p.x, p.z)); gestures.add(p.interaction); if (p.partner) partners[j].add(p.partner);
+      visits[j].minX = Math.min(visits[j].minX, p.x); visits[j].maxX = Math.max(visits[j].maxX, p.x); visits[j].minZ = Math.min(visits[j].minZ, p.z);
+    });
+  }
+  assert.ok(['sniff', 'chase', 'bow', 'paw', 'rest'].every(g => gestures.has(g)));
+  assert.ok(visits.every(v => v.maxX - v.minX > 15)); assert.ok(visits.some(v => v.minZ < -5));
+  assert.ok(partners.every(group => group.size === 5));
+});
+
+
+test('individual moods allow solitude, mixed species groups and asynchronous invitations', () => {
+  let seed = 77; const state = createPetState({ random: () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296) });
+  let solo = false, group = false, sameSpecies = false, mixedMoods = false;
+  for (let i = 0; i < 8000; i++) {
+    stepPets(state, 0.05);
+    const invitations = new Map();
+    for (const pet of state.pets) {
+      solo ||= pet.mode === 'rest' || pet.mode === 'wander';
+      const friend = state.pets.find(p => p.id === pet.partner);
+      sameSpecies ||= !!friend && friend.kind === pet.kind;
+      if (pet.mode === 'play' || pet.mode === 'chase') invitations.set(pet.partner, (invitations.get(pet.partner) || 0) + 1);
+    }
+    group ||= [...invitations.values()].some(n => n >= 2);
+    mixedMoods ||= new Set(state.pets.map(p => p.mode)).size >= 3;
+  }
+  assert.ok(solo && group && sameSpecies && mixedMoods);
+});
