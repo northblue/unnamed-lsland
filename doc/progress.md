@@ -12,6 +12,9 @@
 - 篮球可靠近按 E 捡起 / 放下，移动自动运球，G 投篮，可空格跳投。抛物线 / 篮筐 / 篮板反弹、落地弹跳和投中计数由 basketball.js 管理；按钮提供双语提示。球和本次命中数是会话状态，刷新重新开始，不增加数据库字段、迁移或清空旧进度。
 - 本地 88 项游戏测试和 21 项服务端测试通过：包括多帧率 / 距离投篮、只计一次、暂停 / 出海回收，鲸鱼喷水范围与实际场景发射，猫狗十分钟避障 / 全岛活动 / 更换所有同伴与异步群体邀请，章鱼 / 海马水域路线、不可捕获和几何释放。浏览器实际完成捡球、投篮与反馈检查；完整手机操作、长时 GPU 性能及每种随机社交画面尚未人工验收。
 - 上一版 3ab1961 已由 Actions 44307764613 成功构建并发布；公网 /login 的 BuildID 从 BJYbKv3SewdR-jPQNqQMO 切换至 Tq8CYIHIgKIzwe-uoL4Ht，公开 JS 出现新增模型许可 / 空格提示，确认 NAS 前端实际更新。未读取 NAS 容器 digest 或登录操作生产存档。当前追加功能发布结果将在验证后补记。
+- 正式发布提交 b90a03f， [Actions 44360383416](https://github.com/northblue/unnamed-lsland/actions/runs/44360383416) success：120 项测试（游戏 88 + 服务端 21 + 更新器 11）、Linux 镜像、临时 PostgreSQL / 登录 / 保存 / 重启与真实更新 / 回退验收通过。匿名 registry 核对 amd64、storage-contract 和 nas-stable；Web sha256:142e82e79ffe2f07bb37ac6c58b2eb2dc63aa28845d9d89782478674c34d1118。更新器 digest 未改变，无需手动更换控制器。
+- 已确认 NAS 公网前端自动更新：/login BuildID 从 Tq8CYIHIgKIzwe-uoL4Ht 变为 9_E9wskTjLvIV2Lv2T7Nr，同源公开 JS 包含 Coastal basketball / G Shoot。未输入共享密码或操作 NAS 存档，未直接读取运行容器 digest；认证后玩法仍需用户现场体验。本地实测投中 1 / 出手 1，截图 screenshots/landmarks/basketball-play.png；先前热更新期间一次 toggleBasketball 未定义错误发生于函数尚未写完，完整刷新后正常。真实岛屿自动保存继续运行，本地画面材料 51 / 16、鱼池 5，不能宣称零写入。
+
 
 
 ### 2026-11-18 追日向日葵、跳跃、猫狗模型与自然浅滩

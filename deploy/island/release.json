@@ -1,7 +1,7 @@
 {
-  "sourceCommit": "3ab19617d079195b3c852b0af6f437ec1a4f2548",
+  "sourceCommit": "b90a03f66a01663e1c2989c821cde33a356c2cb7",
   "platform": "linux/amd64",
-  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/44307764613",
+  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/44360383416",
   "trigger": "push",
   "lanOriginSupported": true,
   "sharedPasswordSupported": true,
@@ -10,23 +10,24 @@
   "storageContract": "62b45b60feaffe634df4f1051bb036a10342055033209cecb6dfd3e66dcff2c6",
   "nasChannel": "ghcr.io/northblue/unnamed-island:nas-stable",
   "publicOrigin": "https://unnamed-island.northblue.cc",
-  "nasDeployed": false,
+  "nasDeployed": true,
   "anonymousPullVerified": true,
   "web": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-3ab19617d079195b3c852b0af6f437ec1a4f2548",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:3df2176c84ce71bd46dc51cda0d50257d2026d651bb7469790c12192d8dabf83"
+    "tag": "ghcr.io/northblue/unnamed-island:sha-b90a03f66a01663e1c2989c821cde33a356c2cb7",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:142e82e79ffe2f07bb37ac6c58b2eb2dc63aa28845d9d89782478674c34d1118"
   },
   "tools": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-3ab19617d079195b3c852b0af6f437ec1a4f2548-tools",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:8cf6d3e081b1b8987c7e05caaa726c8e6b42a5d9de638a989386ae2f5b269878"
+    "tag": "ghcr.io/northblue/unnamed-island:sha-b90a03f66a01663e1c2989c821cde33a356c2cb7-tools",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:925f7e1cd777e9a69bc3e012de04d112dd1b1cd38db3e6cfc2c224cfb75bf169"
   },
   "updater": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-3ab19617d079195b3c852b0af6f437ec1a4f2548-updater",
+    "tag": "ghcr.io/northblue/unnamed-island:sha-b90a03f66a01663e1c2989c821cde33a356c2cb7-updater",
     "image": "ghcr.io/northblue/unnamed-island@sha256:b18268cbf7c42a6006c68839a1e9b2a7e9ee53b78697b7297caabc53358f3938"
   },
+  "nasDeploymentVerification": "public frontend build and basketball assets; no authenticated gameplay or running-container digest inspection",
   "nasFrontendVerification": {
-    "buildId": "Tq8CYIHIgKIzwe-uoL4Ht",
-    "publicAssetsVerified": true,
+    "buildId": "9_E9wskTjLvIV2Lv2T7Nr",
+    "basketballAssetsVerified": true,
     "runningContainerDigestVerified": false
   }
 }

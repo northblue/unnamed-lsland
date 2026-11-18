@@ -1,9 +1,9 @@
-# Published image pinned by digest; source commit 3ab1961.
+# Published image pinned by digest; source commit b90a03f.
 # Save without starting; fill DATABASE_URL privately. Save migration and access are pending.
 version: '3.8'
 services:
   web:
-    image: ghcr.io/northblue/unnamed-island@sha256:3df2176c84ce71bd46dc51cda0d50257d2026d651bb7469790c12192d8dabf83
+    image: ghcr.io/northblue/unnamed-island@sha256:142e82e79ffe2f07bb37ac6c58b2eb2dc63aa28845d9d89782478674c34d1118
     platform: linux/amd64
     restart: unless-stopped
     init: true
