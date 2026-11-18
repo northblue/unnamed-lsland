@@ -66,7 +66,7 @@ export function createPetModel(kind = 'cat', variant = 0) {
   if (!cat) oval(tail, cream, -0.1, 0.4, 0.09, 0.09, 0.09, 0.09);
   const legs = new THREE.InstancedMesh(sphere, material(fur), 4), paws = new THREE.InstancedMesh(sphere, material(cream), 4);
   legs.castShadow = paws.castShadow = true; root.add(legs, paws);
-  const size = cat ? 0.96 : variant === 1 ? 1.15 : 1.08; root.scale.setScalar(size);
+  const size = cat ? 0.55 : variant === 1 ? 0.7 : 0.65; root.scale.setScalar(size);
   const anchors = [[0.27, -0.15], [0.27, 0.15], [-0.34, -0.16], [-0.34, 0.16]];
   function update(time, { moving = false, resting = false, playful = false, reduceMotion = false } = {}) {
     const phase = reduceMotion ? 0 : time;

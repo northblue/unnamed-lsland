@@ -1,8 +1,8 @@
-# Shared-password profile. Verified source commit e622ac9.
+# Shared-password profile. Verified source commit 16aad61.
 # Update the EXISTING Web project; preserve its private DATABASE_URL.
 services:
   web:
-    image: ghcr.io/northblue/unnamed-island@sha256:04792706f42b7de1ce4040e85e6f0200e55f7473a2b6e5c8959dfca1cc3bfa75
+    image: ghcr.io/northblue/unnamed-island@sha256:36e7dee5f8487fe6710b0d91556793f87a8a3b0dfb500b2db1417155c1dccbd0
     platform: linux/amd64
     restart: unless-stopped
     init: true

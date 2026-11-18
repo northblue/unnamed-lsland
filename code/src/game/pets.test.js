@@ -30,7 +30,7 @@ test('pet anatomy has articulated heads, tails, paws, collars and independently 
     assert.notEqual(tail.rotation.y, b.root.getObjectByName('pet-tail').rotation.y);
     a.update(20, { reduceMotion: true }); const quiet = tail.rotation.y; a.update(40, { reduceMotion: true }); assert.equal(tail.rotation.y, quiet);
     let calls = 0; a.root.traverse(o => { if (o.isMesh) calls++; }); assert.ok(calls < 20);
-    const box = new THREE.Box3().setFromObject(a.root); assert.ok(box.min.y > -0.01 && box.max.y > 0.8);
+    const box = new THREE.Box3().setFromObject(a.root); assert.ok(box.min.y > -0.01 && box.max.y > 0.5 && box.max.y < 1);
     a.dispose(); b.dispose();
   }
 });

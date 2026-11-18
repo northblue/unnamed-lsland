@@ -32,6 +32,11 @@ export function formatIslandTime(minutes) {
   return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
 }
 
+// Shared by island lighting and the sunflower; not a geographic solar model.
+export function solarPositionAt(cycle) {
+  return { x: -Math.cos(cycle.angle) * 26, y: Math.max(4, cycle.altitude * 28), z: 10 };
+}
+
 export function createDayClock(initialHour = localHour()) {
   let hour = wrapHour(initialHour);
   let dayMinutes = null;

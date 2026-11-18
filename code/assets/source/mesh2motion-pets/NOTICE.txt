@@ -1,0 +1,17 @@
+Unnamed Island animal model credits
+
+Cat: Carrot, credited upstream to David Revoy (Pepper&Carrot), CC BY.
+Author and original character: https://www.peppercarrot.com/
+Attribution/license guidance: https://www.peppercarrot.com/en/documentation/120_License_best_practices.html
+Pepper&Carrot license: https://creativecommons.org/licenses/by/4.0/
+Mesh2Motion RigConfig.ts specifically marks the cat variation CC-BY; it is NOT covered solely by the repository CC0 notice.
+
+Dog, skeleton and animations: Mesh2Motion / Scott Petrovic, CC0 1.0.
+https://mesh2motion.org/
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Downloaded from Mesh2Motion/mesh2motion-app at bcb014ea25e44f76b3add78463f72d1faec16418.
+https://github.com/Mesh2Motion/mesh2motion-app/tree/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox
+Individual license evidence: src/lib/RigConfig.ts at the same revision.
+
+Changes: combined six existing animations into self-contained GLB files and retargeted local rest-pose differences; preserved original painted textures. The game normalizes size and orientation and applies subtle per-instance material tints. No endorsement is implied.

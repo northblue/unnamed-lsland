@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { coastRadius, terrainHeight } from './world.js';
+import { coastRadius } from './world.js';
+import { beachHeight } from './beach.js';
 
 // A thin swash sheet follows the beach lip; gameplay terrain remains unchanged.
 export function createShoreWaves(scene) {
@@ -8,9 +9,7 @@ export function createShoreWaves(scene) {
     const r=0.952+row/rows*0.23,angle=col/segments*Math.PI*2;
     const radius=coastRadius(angle), x=Math.cos(angle)*radius*r,z=Math.sin(angle)*radius*r;
     ratios.push(r);
-    const land=terrainHeight(x,z)+0.018;
-    const drop=THREE.MathUtils.smoothstep(r,1.0,1.035);
-    positions.push(x,THREE.MathUtils.lerp(land,-0.065,drop),z);
+    positions.push(x,Math.max(-0.09,beachHeight(x,z)+0.018),z);
     if(row<rows&&col<segments){const a=row*(segments+1)+col,b=a+segments+1;indices.push(a,b,a+1,a+1,b,b+1);}
   }
   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setIndex(indices);

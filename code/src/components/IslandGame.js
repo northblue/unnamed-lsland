@@ -247,14 +247,14 @@ export default function IslandGame() {
             onClick={() => gameRef.current?.cameraCommand(action)}>{label}</button>)}
       </div>
       <p>{text.cameraHelp}</p>
-      <p>{text.landmarks.note}</p>
+      <p>{text.landmarks.note} · <a href="/models/mesh2motion-pets/NOTICE.txt" target="_blank" rel="noreferrer">{text.modelCredits}</a></p>
     </details>
     </div>
     <aside className="chapter"><span className="chapter-number">01</span><div><small>{text.chapter}</small><p>{text.goal}</p></div></aside>
     <section className="guide" aria-label={text.instructions}>
       <span className="guide-icon">✦</span>
       <div><h2>{text.guideTitle}</h2><p>{text.guideBody}</p>
-        <div className="controls"><kbd>W A S D</kbd><span>{text.or}</span><kbd>↑ ← ↓ →</kbd><span>{text.move}</span></div>
+        <div className="controls"><kbd>W A S D</kbd><span>{text.or}</span><kbd>↑ ← ↓ →</kbd><span>{text.move}</span><kbd>{text.space}</kbd><span>{text.jump}</span></div>
         <div className="gather-prompt" aria-live="polite">
           {fishingActive ? fishingPrompt : !hud.buildingMode && supplies.nearby ? <><kbd>E</kbd> {text.supplies.prompt.replace('{kind}',text.supplies[supplies.nearby])}</> : hud.buildingMode ? text.buildHelp : hud.target
             ? hud.target.remaining > 0

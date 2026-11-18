@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { COURT, LIGHTHOUSE, SUNFLOWER, terrainHeight } from './world.js';
+import { sunflowerPose } from './sunflower.js';
+import { dayCycleAt } from './dayCycle.js';
 
 export function createIslandLandmarks(scene) {
   const root = new THREE.Group(); root.name = 'island-landmarks'; scene.add(root);
@@ -96,7 +98,7 @@ export function createIslandLandmarks(scene) {
   const seam = standard('#684a35');
   for (let i = 0; i < 3; i++) { const band = mesh(new THREE.TorusGeometry(0.252, 0.007, 5, 40), seam, 0, 0, 0, basketball); band.rotation.set(i * Math.PI / 2, i * 0.6, 0); }
 
-  const flower = new THREE.Group(); flower.name = 'giant-sunflower'; flower.position.set(SUNFLOWER.x, terrainHeight(SUNFLOWER.x, SUNFLOWER.z), SUNFLOWER.z); root.add(flower);
+  const flower = new THREE.Group(); flower.name = 'giant-sunflower'; flower.scale.setScalar(0.52); flower.position.set(SUNFLOWER.x, terrainHeight(SUNFLOWER.x, SUNFLOWER.z), SUNFLOWER.z); root.add(flower);
   const green = standard('#568347'), leafGreen = standard('#709b53', { side: THREE.DoubleSide });
   const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(), new THREE.Vector3(-0.16, 1.8, 0), new THREE.Vector3(0.2, 3.8, 0), new THREE.Vector3(0, 5.15, 0)]);
   mesh(new THREE.TubeGeometry(curve, 24, 0.1, 8, false), green, 0, 0, 0, flower);
@@ -106,7 +108,8 @@ export function createIslandLandmarks(scene) {
     leaf.rotation.set(0.35, i * 2.4, i % 2 ? -1.05 : 1.05);
     link([0, 0, 0.015], [0, 1.03, 0.015], 0.013, green, leaf);
   }
-  const head = new THREE.Group(); head.position.y = 5.15; head.rotation.set(-0.12, 0.35, 0); flower.add(head);
+  const head = new THREE.Group(); head.name = 'sunflower-head'; head.position.y = 5.15; flower.add(head);
+  const calyx = mesh(new THREE.SphereGeometry(1, 20, 12), green, 0, 0, -0.12, head); calyx.scale.set(0.61, 0.61, 0.17);
   const gold = standard('#e9b447'), warmGold = standard('#f2cc5b'), brown = standard('#694c2e');
   const petalGeometry = new THREE.SphereGeometry(1, 12, 8); geometries.add(petalGeometry);
   const dummy = new THREE.Object3D();
@@ -145,6 +148,20 @@ export function createIslandLandmarks(scene) {
     const g = mergeGeometries(bucket.parts, false); bucket.parts.forEach(part => part.dispose()); geometries.add(g);
     const object = new THREE.Mesh(g, bucket.material); object.castShadow = bucket.castShadow; object.receiveShadow = true; root.add(object);
   }
-  return { root, update(time, reduceMotion = false) { head.rotation.z = reduceMotion ? 0 : Math.sin(time * 0.7) * 0.055; },
+  const origin = { x: SUNFLOWER.x, y: flower.position.y + 5.15 * flower.scale.y, z: SUNFLOWER.z };
+  const normal = new THREE.Vector3(), front = new THREE.Vector3(0, 0, 1), targetRotation = new THREE.Quaternion(), wind = new THREE.Quaternion();
+  let initialized = false;
+  return { root, update(time, reduceMotion = false, cycle = dayCycleAt(12), dt = 0.04) {
+    const pose = sunflowerPose(cycle, origin);
+    normal.set(pose.direction.x, pose.direction.y, pose.direction.z);
+    targetRotation.setFromUnitVectors(front, normal);
+    wind.setFromAxisAngle(front, reduceMotion ? 0 : Math.sin(time * 0.7) * 0.035 * cycle.daylight);
+    targetRotation.multiply(wind);
+    const blend = !initialized || reduceMotion ? 1 : 1 - Math.exp(-Math.max(0, dt) * 2);
+    head.quaternion.slerp(targetRotation, blend);
+    head.position.y = THREE.MathUtils.lerp(head.position.y, 5.15 - pose.droop * 0.3, blend);
+    head.position.z = THREE.MathUtils.lerp(head.position.z, pose.droop * 0.2, blend);
+    initialized = true;
+  },
     dispose() { root.removeFromParent(); root.traverse(o => { if (o.isInstancedMesh) o.dispose(); }); geometries.forEach(g => g.dispose()); materials.forEach(m => m.dispose()); textures.forEach(t => t.dispose()); } };
 }

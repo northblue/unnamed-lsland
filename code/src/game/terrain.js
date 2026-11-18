@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { ISLAND, SCENERY_ROCKS, terrainHeight, coastRadius, LIGHTHOUSE } from './world.js';
+import { createBeachGeometry } from './beach.js';
 
 export function createTerrain(scene) {
   const group = new THREE.Group(); scene.add(group);
@@ -53,14 +54,7 @@ export function createTerrain(scene) {
   }
   const surface = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 }));
   surface.castShadow = true; surface.receiveShadow = true; group.add(surface);
-  const rimPositions = [], rimIndices = [];
-  for (let i = 0; i <= 256; i++) {
-    const a = i / 256 * Math.PI * 2, radius = coastRadius(a), x = Math.cos(a) * radius, z = Math.sin(a) * radius;
-    rimPositions.push(x, 0.52, z, x * 1.005, -0.3, z * 1.005);
-    if (i < 256) { const k = i * 2; rimIndices.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
-  }
-  const rim = new THREE.BufferGeometry(); rim.setAttribute('position', new THREE.Float32BufferAttribute(rimPositions, 3)); rim.setIndex(rimIndices); rim.computeVertexNormals();
-  const side = new THREE.Mesh(rim, new THREE.MeshStandardMaterial({ color: '#e9d5a9', roughness: 1, side: THREE.DoubleSide }));
+  const side = new THREE.Mesh(createBeachGeometry(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, side: THREE.DoubleSide })); side.name = 'sloping-sand-shelf';
   side.receiveShadow = true; group.add(side);
   // Irregular rock ledges hug the height field; their tops never rise above
   // walkable ground. Grass caps and stone bands reveal the terraced silhouette.

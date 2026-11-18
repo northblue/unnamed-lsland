@@ -65,7 +65,7 @@ export function createCoastalLife(scene){
     if(Math.hypot(x-POND.x,z-POND.z)<POND.radius+0.6)continue;
     const shell=createShellModel(i);shell.root.position.set(x,terrainHeight(x,z)+0.12,z);shell.root.rotation.set(0.9,i*1.9,0.25);shell.root.scale.setScalar(0.45+(i%3)*0.1);root.add(shell.root);shells.push(shell);
   }
-  for(let i=0;i<4;i++){const crab=createCrabModel();root.add(crab.root);crabs.push({...crab,angle:0.85+i*0.48});}
+  for(let i=0;i<4;i++){const crab=createCrabModel();crab.root.scale.setScalar(0.45);root.add(crab.root);crabs.push({...crab,angle:0.85+i*0.48});}
   return {update(time,reduceMotion=false){crabs.forEach((crab,i)=>{
     const a=crab.angle+(reduceMotion?0:Math.sin(time*0.14+i)*0.065),r=0.9;
     const x=Math.cos(a)*ISLAND.x*r,z=Math.sin(a)*ISLAND.z*r;

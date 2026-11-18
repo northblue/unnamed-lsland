@@ -15,6 +15,7 @@ export function stepPets(state, seconds, { buildings = [], obstacles = OBSTACLES
     pet.mode = ['rest', 'wander', 'chase', 'play'][cycle];
     pet.moving = false;
     if (pet.mode === 'rest') continue;
+    if (pet.mode === 'play' && Math.sin(state.time * 1.4 + i) > 0.35) continue;
     if (state.time >= pet.nextTarget) {
       const phase = state.time * 0.29 + i * 2.399;
       const target = { x: COURT.x + Math.cos(phase) * (4.9 + Math.sin(i) * 0.7), z: COURT.z + Math.sin(phase * 0.81) * 3.6 };

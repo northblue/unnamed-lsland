@@ -6,7 +6,8 @@ import { createBuildSelection } from './buildSelection.js';
 import { isTap } from './waterInteraction.js';
 import { createIslandState, validateIslandState } from './islandState.js';
 import { createWater } from './water.js';
-import { createDayClock, localHour } from './dayCycle.js';
+import { createDayClock, localHour, solarPositionAt } from './dayCycle.js';
+import { createJumpState, startJump, stepJump } from './jump.js';
 import { createSky } from './sky.js';
 import { createClouds } from './clouds.js';
 import { createSkyVolume } from './skyVolume.js';
@@ -39,6 +40,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
   let catches = { ...initial.catches };
   let pond = { ...initial.pond };
   const fishing = createFishingState();
+  const jump = createJumpState();
   const construction = { buildings: [] };
   let buildingMode = false;
   let buildNoticeUntil = 0;
@@ -349,6 +351,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
       }
     }
     player.position.set(state.player.x, terrainHeight(state.player.x, state.player.z), state.player.z);
+    Object.assign(jump, createJumpState());
     setBuilding(false);
     lastSnapshotSignature = JSON.stringify(getSnapshot());
   }
@@ -363,6 +366,11 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     if (paused) return;
     if (e.code === 'Escape' && buildingMode) { e.preventDefault(); setBuilding(false); return; }
     if (e.target?.closest?.('input, textarea, select, button, [contenteditable="true"]') || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (!e.repeat && !keys.has(e.code) && !buildingMode && !['waiting', 'caught'].includes(fishing.phase)) startJump(jump);
+      keys.add(e.code); return;
+    }
     if (e.code === 'Escape' && fishing.phase !== 'idle') { e.preventDefault(); cancelFishing(); return; }
     if (e.code === 'KeyF' && !e.repeat) { e.preventDefault(); toggleFishing(); return; }
     if (fishing.phase === 'waiting' || fishing.phase === 'caught') return;
@@ -413,14 +421,15 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
       ambient.groundColor.copy(nightGround).lerp(dayGround, cycle.daylight);
       sun.intensity = cycle.daylight * 3;
       sun.color.copy(middaySun).lerp(sunsetSun, cycle.twilight);
-      sun.position.set(-Math.cos(cycle.angle) * 26, Math.max(4, cycle.altitude * 28), 10);
+      const solarPosition = solarPositionAt(cycle);
+      sun.position.set(solarPosition.x, solarPosition.y, solarPosition.z);
       moonlight.intensity = (1 - cycle.daylight) * 0.65;
       moonlight.position.set(Math.cos(cycle.angle) * 22, Math.max(6, -cycle.altitude * 24), -12);
       water.setDaylight(cycle.daylight);
       clouds.update(waterTime, cycle.daylight, reduceMotion.matches, cycle.twilight);
       skyVolume.update(cycle.daylight);
       lighthouse.update(waterTime, cycle.daylight, reduceMotion.matches);
-      landmarks.update(waterTime, reduceMotion.matches);
+      landmarks.update(waterTime, reduceMotion.matches, cycle, dt);
       pets.update(paused ? 0 : dt, construction.buildings, gathering.resources, reduceMotion.matches);
       coastalLife.update(waterTime, reduceMotion.matches);
       waterTime += dt;
@@ -466,9 +475,11 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
         movePlayer(player.position, dx * dt * 4, dz * dt * 4, construction.buildings, activeObstacles(gathering.resources));
         player.rotation.y = Math.atan2(-dx, -dz);
         elapsed += dt;
-        player.position.y = terrainHeight(player.position.x, player.position.z) + Math.sin(elapsed * 16) * 0.035;
-      } else player.position.y = terrainHeight(player.position.x, player.position.z);
-      playerModel.update(waterTime,{moving:Boolean(walking),fishing:fishing.phase!=='idle',reduceMotion:reduceMotion.matches});
+      }
+      stepJump(jump, paused ? 0 : dt);
+      player.position.y = terrainHeight(player.position.x, player.position.z) + jump.height
+        + (walking && jump.grounded && !reduceMotion.matches ? Math.sin(elapsed * 16) * 0.035 : 0);
+      playerModel.update(waterTime,{moving:Boolean(walking),jumping:!jump.grounded,fishing:fishing.phase!=='idle',reduceMotion:reduceMotion.matches});
       fishingView.update(fishing, player.position, waterTime, water.surfaceHeight, reduceMotion.matches, playerModel.gripPosition());
       while (pendingInteractions > 0) {
         pendingInteractions -= 1;

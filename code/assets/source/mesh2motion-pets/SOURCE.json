@@ -1,0 +1,78 @@
+{
+  "repository": "https://github.com/Mesh2Motion/mesh2motion-app",
+  "commit": "bcb014ea25e44f76b3add78463f72d1faec16418",
+  "files": [
+    {
+      "file": "cat.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/variations/cat.glb",
+      "bytes": 278180,
+      "sha256": "00c663dcfbd5d77405de178d8e47a9f81c22668a05757173b91ad4ab1cf5514e"
+    },
+    {
+      "file": "dog.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/variations/dog.glb",
+      "bytes": 394128,
+      "sha256": "aeb01fa780ba63b1d4283434a944e977183c2c5fad14f827bdf5f1e5c308227c"
+    },
+    {
+      "file": "LICENSE-CC0.md",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/LICENSE-CC0.MD",
+      "bytes": 294,
+      "sha256": "52fec1c484df708c16b4c27b2bf0d7f0d3994105c57adc4b9e6f95bcfd9de65f"
+    },
+    {
+      "file": "RigConfig.ts",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/src/lib/RigConfig.ts",
+      "bytes": 14786,
+      "sha256": "6fc3d976dcf6a27fe36f6190803072b4ef8587a1ce05ee38366a3b952fb0ad9b"
+    },
+    {
+      "file": "cat-preview.png",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/variation-previews/fox/cat.png",
+      "bytes": 33041,
+      "sha256": "37666ee8e664786241698595a874e769012c748a81b7ba6de559c8ab0b567a9d"
+    },
+    {
+      "file": "dog-preview.png",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/variation-previews/fox/dog.png",
+      "bytes": 40320,
+      "sha256": "7877c62ab94a73d7d3f3705df4b6abddc24166c0ee7e643dcffd2f44fc2eedf2"
+    },
+    {
+      "file": "walk.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/animations/walk.glb",
+      "bytes": 50468,
+      "sha256": "4ae1ada4c1f5a31168539e6f53de9546121689320c9432121d20154a2542c6e7"
+    },
+    {
+      "file": "run.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/animations/run.glb",
+      "bytes": 49428,
+      "sha256": "01afc506c2a74c5be2573d326b356d97e4d2a46f22bdef25019aab8d5685cf3f"
+    },
+    {
+      "file": "idle.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/animations/idle.glb",
+      "bytes": 51788,
+      "sha256": "984b1c44b6ab6399e7f602692daf76c095aacfad9c636f11f7bfaaf2b2e21038"
+    },
+    {
+      "file": "play-bow.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/animations/play-bow.glb",
+      "bytes": 60152,
+      "sha256": "b72c060154dc11b37239d0fdd2ffc03146c5d5738f1cee9a616a4fe4adddfcf7"
+    },
+    {
+      "file": "sit.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/animations/sit.glb",
+      "bytes": 50272,
+      "sha256": "e7c5182f3514baff37abdced81684bd4f55c5a51b5fb2111e84276e92cb25d91"
+    },
+    {
+      "file": "sleep.glb",
+      "url": "https://raw.githubusercontent.com/Mesh2Motion/mesh2motion-app/bcb014ea25e44f76b3add78463f72d1faec16418/static/assets/fox/animations/sleep.glb",
+      "bytes": 53936,
+      "sha256": "ac96d9d30319690c43180f932cb4010f2f4ced5fe6c9e5c10650714f115cc93e"
+    }
+  ]
+}

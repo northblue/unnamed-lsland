@@ -49,6 +49,6 @@
 
 本地 11 项更新器测试通过；[Actions 44170757949](https://github.com/northblue/unnamed-lsland/actions/runs/44170757949) 由 push 自动触发并成功，包含 99 项测试、三镜像构建和临时 Docker / PostgreSQL / registry 真实替换、同版不重启、坏版本健康失败回退、坏 digest 阻止和数据库容器不变检查。三镜像摘要 / linux/amd64 / 匿名拉取与 nas-stable 解析结果已实际核对，正式固定版本见配置包 release.json。
 
-NAS 的 socket 兼容性、绿联项目刷新、掉电恢复和真实更新仍需一次现场验收；尚未在 NAS 启用。第一次先安装 WEB-IMAGE.txt 的 Web，再导入独立更新器，不要只换旧 Web 为 nas-stable 标签。
+2026-11-18 用户已在 NAS 启用更新器，截图多次显示当前 Web 的 UP TO DATE，确认现场轮询正常。真实版本替换 / 健康失败回退、绿联项目刷新和掉电恢复仍需现场验证。首次安装仍应先使用 WEB-IMAGE.txt 的 Web，再导入独立更新器，不要只换旧 Web 为 nas-stable 标签；已经启用的实例不需每次重新导入。
 
 官方命令依据：[Compose up](https://docs.docker.com/reference/cli/docker/compose/up/)、[Compose config](https://docs.docker.com/reference/cli/docker/compose/config/)、[GitHub workflow trigger](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow)。

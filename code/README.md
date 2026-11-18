@@ -26,6 +26,7 @@ WASD / 方向键移动，靠近树木或大石头按 E 采集。每处资源提�
 | 操作 | 方式 |
 | --- | --- |
 | 移动 / 采集 | WASD / 方向键；靠近资源按 E |
+| 跳跃 | 空格；落地后可再次起跳，按住不会连跳；建造 / 等待鱼上钩时禁用 |
 | 建造 / 取消 | 材料够后点放置小屋、推荐空地、确认；Esc 取消 |
 | 钓鱼 | 靠岸按 F，点击海面或附近鱼群按钮；F / Esc 收竿退出 |
 | 镜头 | 拖动、滚轮及视角按钮；建造时右键拖动 |
@@ -75,3 +76,7 @@ Docker 构建上下文为 code/，Dockerfile 的 web / tools 分别对应应用�
 ## 局域网访问
 
 可显式设置 `APP_ORIGIN=http://192.168.4.82:3080`，再将 NAS 该 IP 的 3080 映射到容器 3000；默认未设置仍仅 localhost。写入需精确匹配 Origin，伪造 forwarded 头不放行。先迁移旧存档，再启用浏览器入口，具体版本和操作见 [局域网说明](../doc/nas-lan-access.md)。
+
+## 猫狗素材署名
+
+猫狗采用 Mesh2Motion 的绘制纹理和骨骼动画。猫为 Carrot / David Revoy（CC BY，原角色 Pepper&Carrot），狗及动画为 Mesh2Motion / Scott Petrovic（CC0）。具体来源、改动和许可链接见 [游戏附带 NOTICE](public/models/mesh2motion-pets/NOTICE.txt) 与 [素材记录](../doc/references/pet-models.md)。程序造型保留为加载失败回退。
