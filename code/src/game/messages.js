@@ -1,5 +1,6 @@
 export const messages = {
   zh: {
+    landmarks: { lighthouse: '灯塔高地', court: '半场篮球场', garden: '向日葵与伙伴', note: '岩阶灯塔 · 海边球场 · 大向日葵 · 3 只小猫与 3 只小狗自由玩耍' },
     display: { focusIsland: '专注小岛', showMenus: '显示菜单', saveWarning: '保存未成功，请展开菜单查看。' },
     auth: { title: '登录无名岛 · Unnamed Island', heading: '欢迎回到无名岛', intro: '输入岛主提供的共享密码，一起继续这座岛的故事。', password: '共享密码', enter: '进入小岛', entering: '正在验证…', logout: '保存并退出登录', leaving: '正在保存并退出…', relogin: '在新标签页重新登录', language: '界面语言', zhLabel: '中文', enLabel: 'English', note: '登录可保持 7 天。这是一座家人共用的小岛。', errors: { invalidPassword: '密码不正确，请再试一次。', rateLimited: '尝试次数较多，请稍等一分钟再试。', authUnavailable: '登录暂时不可用，请联系岛主检查访问设置。', invalidRequest: '登录请求无效，请重新输入密码。', localOnly: '请使用岛主提供的小岛地址。', logoutSave: '退出前保存未成功，请先检查保存状态再重试。' } },
     constellations: { names: { cassiopeia: '仙后座', orion: '猎户座', crux: '南十字座' }, note: '星座为艺术化排布，非实时星图。' },
@@ -79,6 +80,7 @@ export const messages = {
     },
   },
   en: {
+    landmarks: { lighthouse: 'Lighthouse bluff', court: 'Basketball court', garden: 'Sunflower & friends', note: 'Rocky lighthouse · Coastal half-court · Giant sunflower · 3 cats and 3 dogs at play' },
     display: { focusIsland: 'Focus island', showMenus: 'Show menus', saveWarning: 'Save failed. Open the menus for details.' },
     auth: { title: 'Sign in · Unnamed Island', heading: 'Welcome to your island', intro: 'Enter the shared password from your host to continue the island story together.', password: 'Shared password', enter: 'Enter the island', entering: 'Checking…', logout: 'Save and sign out', leaving: 'Saving and signing out…', relogin: 'Sign in again in a new tab', language: 'Language', zhLabel: '中文', enLabel: 'English', note: 'Stay signed in for 7 days. Your family shares this island.', errors: { invalidPassword: 'Incorrect password. Please try again.', rateLimited: 'Too many attempts. Please wait a minute and try again.', authUnavailable: 'Sign-in is unavailable. Ask your host to check the access settings.', invalidRequest: 'Invalid sign-in request. Enter the password again.', localOnly: 'Use the island address provided by your host.', logoutSave: 'Your save did not finish. Check the save status before signing out.' } },
     constellations: { names: { cassiopeia: 'Cassiopeia', orion: 'Orion', crux: 'Southern Cross' }, note: 'Artistic constellations, not a live sky map.' },

@@ -1,23 +1,25 @@
 import * as THREE from 'three';
-import { ISLAND, terrainHeight } from './world.js';
+import { coastRadius, terrainHeight } from './world.js';
 
 // A thin swash sheet follows the beach lip; gameplay terrain remains unchanged.
 export function createShoreWaves(scene) {
-  const positions=[],indices=[],segments=192,rows=28;
+  const positions=[],indices=[],ratios=[],segments=256,rows=28;
   for(let row=0;row<=rows;row++)for(let col=0;col<=segments;col++) {
     const r=0.952+row/rows*0.23,angle=col/segments*Math.PI*2;
-    const x=Math.cos(angle)*ISLAND.x*r,z=Math.sin(angle)*ISLAND.z*r;
+    const radius=coastRadius(angle), x=Math.cos(angle)*radius*r,z=Math.sin(angle)*radius*r;
+    ratios.push(r);
     const land=terrainHeight(x,z)+0.018;
     const drop=THREE.MathUtils.smoothstep(r,1.0,1.035);
     positions.push(x,THREE.MathUtils.lerp(land,-0.065,drop),z);
     if(row<rows&&col<segments){const a=row*(segments+1)+col,b=a+segments+1;indices.push(a,b,a+1,a+1,b,b+1);}
   }
   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setIndex(indices);
+  geometry.setAttribute('shoreRatio',new THREE.Float32BufferAttribute(ratios,1));
   const material=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,
-    uniforms:{time:{value:0},island:{value:new THREE.Vector2(ISLAND.x,ISLAND.z)},daylight:{value:1}},
-    vertexShader:`varying vec2 shore;void main(){shore=position.xz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
-    fragmentShader:`varying vec2 shore;uniform vec2 island;uniform float time,daylight;
-      void main(){float r=length(shore/island);float angle=atan(shore.y,shore.x);
+    uniforms:{time:{value:0},daylight:{value:1}},
+    vertexShader:`attribute float shoreRatio;varying float ratio;varying vec2 shore;void main(){ratio=shoreRatio;shore=position.xz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+    fragmentShader:`varying vec2 shore;varying float ratio;uniform float time,daylight;
+      void main(){float r=ratio;float angle=atan(shore.y,shore.x);
         float phase=fract(time/8.5+sin(angle*3.0)*0.075);
         float advance=smoothstep(0.0,1.0,phase);
         float irregular=sin(angle*15.0+time*0.22)*0.002+sin(angle*31.0)*0.0015;

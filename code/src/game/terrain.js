@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ISLAND, SCENERY_ROCKS, terrainHeight } from './world.js';
+import { ISLAND, SCENERY_ROCKS, terrainHeight, coastRadius, LIGHTHOUSE } from './world.js';
 
 export function createTerrain(scene) {
   const group = new THREE.Group(); scene.add(group);
@@ -12,7 +12,8 @@ export function createTerrain(scene) {
     const r = row / rings;
     for (let col = 0; col <= segments; col++) {
       const angle = col / segments * Math.PI * 2;
-      const x = Math.cos(angle) * ISLAND.x * r, z = Math.sin(angle) * ISLAND.z * r;
+      const radius = coastRadius(angle);
+      const x = Math.cos(angle) * radius * r, z = Math.sin(angle) * radius * r;
       const y = terrainHeight(x, z);
       positions.push(x, y, z);
       const edge = 0.78 + Math.sin(angle * 5) * 0.025 + Math.sin(angle * 9) * 0.015;
@@ -22,6 +23,12 @@ export function createTerrain(scene) {
       color.copy(sand).lerp(grass, green);
       color.lerp(upland, green * THREE.MathUtils.smoothstep(y, 1.5, 5) * 0.35);
       color.lerp(stone, exposed * 0.8);
+      // The headland is pale weathered rock, with sandy landings instead of grass.
+      const headlandDistance = Math.hypot(x - LIGHTHOUSE.x, z - LIGHTHOUSE.z);
+      const headlandMask = (1 - THREE.MathUtils.smoothstep(headlandDistance, 3.8, 4.7))
+        * THREE.MathUtils.smoothstep(Math.hypot(x / ISLAND.x, z / ISLAND.z), 1, 1.035);
+      const cliffShade = new THREE.Color('#aaa99c').multiplyScalar(0.94 + Math.sin(y * 4.1 + x * 0.6) * 0.04);
+      color.lerp(cliffShade, headlandMask * THREE.MathUtils.smoothstep(slope, 0.25, 0.8));
       // Broad, weathered variation follows the rock instead of hard dark bands.
       color.multiplyScalar(1 - exposed * (0.035 + 0.035 * Math.sin(y * 1.7 + Math.sin(x * 0.6 + z * 0.4))));
       color.multiplyScalar(0.97 + Math.sin(x * 2.4) * Math.cos(z * 1.9) * 0.025);
@@ -46,8 +53,15 @@ export function createTerrain(scene) {
   }
   const surface = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 }));
   surface.castShadow = true; surface.receiveShadow = true; group.add(surface);
-  const side = new THREE.Mesh(new THREE.CylinderGeometry(1, 1.025, 0.8, 128, 1, true), new THREE.MeshStandardMaterial({ color: '#e9d5a9', roughness: 1 }));
-  side.scale.set(ISLAND.x, 1, ISLAND.z); side.position.y = 0.12; side.receiveShadow = true; group.add(side);
+  const rimPositions = [], rimIndices = [];
+  for (let i = 0; i <= 256; i++) {
+    const a = i / 256 * Math.PI * 2, radius = coastRadius(a), x = Math.cos(a) * radius, z = Math.sin(a) * radius;
+    rimPositions.push(x, 0.52, z, x * 1.005, -0.3, z * 1.005);
+    if (i < 256) { const k = i * 2; rimIndices.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
+  }
+  const rim = new THREE.BufferGeometry(); rim.setAttribute('position', new THREE.Float32BufferAttribute(rimPositions, 3)); rim.setIndex(rimIndices); rim.computeVertexNormals();
+  const side = new THREE.Mesh(rim, new THREE.MeshStandardMaterial({ color: '#e9d5a9', roughness: 1, side: THREE.DoubleSide }));
+  side.receiveShadow = true; group.add(side);
   // Irregular rock ledges hug the height field; their tops never rise above
   // walkable ground. Grass caps and stone bands reveal the terraced silhouette.
   const cliffMaterial = new THREE.MeshStandardMaterial({color:'#969b89',roughness:1});
@@ -62,6 +76,32 @@ export function createTerrain(scene) {
     column.position.set(x,(y+0.52)/2-0.28,z);column.rotation.y=i*0.7;
     column.castShadow=column.receiveShadow=true;group.add(column);
   }
+  // Weathered columns reveal three levels of the new lighthouse promontory.
+  const cliffColors = ['#989b91', '#b3b3a2', '#8c948a'];
+  const columns = [], instance = new THREE.Object3D();
+  for (let ring = 0; ring < 3; ring++) {
+    const d = 2.5 + ring * 0.72;
+    for (let i = 0; i < 22; i++) {
+      const a = i / 22 * Math.PI * 2 + ring * 0.13;
+      const x = LIGHTHOUSE.x + Math.cos(a) * d, z = LIGHTHOUSE.z + Math.sin(a) * d;
+      if (Math.hypot(x / ISLAND.x, z / ISLAND.z) <= 1.01) continue;
+      const y = terrainHeight(x, z); if (y < 1) continue;
+      instance.position.set(x, y * 0.5 - 0.08, z); instance.scale.set(0.52 + i % 3 * 0.1, y * 0.54, 0.55 + i % 4 * 0.07);
+      instance.rotation.set(0.03 * Math.sin(i), i * 1.37, 0.05 * Math.cos(i)); instance.updateMatrix();
+      columns.push({ matrix: instance.matrix.clone(), color: cliffColors[(i + ring) % 3] });
+    }
+  }
+  const cliffGeometry = new THREE.IcosahedronGeometry(1, 1);
+  const vertices = cliffGeometry.attributes.position;
+  for (let i = 0; i < vertices.count; i++) {
+    const x = vertices.getX(i), y = vertices.getY(i), z = vertices.getZ(i);
+    const scale = 1 + 0.12 * Math.sin(x * 9 + z * 5 + y * 7);
+    vertices.setXYZ(i, x * scale, y, z * scale);
+  }
+  cliffGeometry.computeVertexNormals();
+  const cliffInstances = new THREE.InstancedMesh(cliffGeometry, new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.95, flatShading: true }), columns.length);
+  columns.forEach((column, i) => { cliffInstances.setMatrixAt(i, column.matrix); cliffInstances.setColorAt(i, new THREE.Color(column.color)); });
+  cliffInstances.castShadow = cliffInstances.receiveShadow = true; group.add(cliffInstances);
   const stairMaterial=new THREE.MeshStandardMaterial({color:'#c9bb95',roughness:1});
   for(let i=0;i<24;i++) {
     const x=-13.8-i*0.095,z=4.5-i*0.3,y=terrainHeight(x,z);
@@ -78,6 +118,6 @@ export function createTerrain(scene) {
   }
   return {
     surface, perches,
-    dispose() { group.removeFromParent(); group.traverse((object) => { object.geometry?.dispose(); object.material?.dispose(); }); },
+    dispose() { group.removeFromParent(); cliffInstances.dispose(); group.traverse((object) => { object.geometry?.dispose(); object.material?.dispose(); }); },
   };
 }

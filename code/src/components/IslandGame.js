@@ -239,6 +239,7 @@ export default function IslandGame() {
         <button type="button" onClick={() => gameRef.current?.cameraCommand('top')}>{text.top}</button>
         <button type="button" onClick={() => gameRef.current?.cameraCommand('side')}>{text.side}</button>
         <button type="button" onClick={() => gameRef.current?.cameraCommand('reset')}>{text.resetView}</button>
+        {['lighthouse', 'court', 'garden'].map(place => <button type="button" key={place} disabled={status !== 'ready'} onClick={() => gameRef.current?.cameraCommand(place)}>{text.landmarks[place]}</button>)}
       </div>
       <div className="camera-buttons">
         {[['left', '↶'], ['right', '↷'], ['in', '+'], ['out', '−']].map(([action, label]) =>
@@ -246,6 +247,7 @@ export default function IslandGame() {
             onClick={() => gameRef.current?.cameraCommand(action)}>{label}</button>)}
       </div>
       <p>{text.cameraHelp}</p>
+      <p>{text.landmarks.note}</p>
     </details>
     </div>
     <aside className="chapter"><span className="chapter-number">01</span><div><small>{text.chapter}</small><p>{text.goal}</p></div></aside>

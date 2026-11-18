@@ -5,6 +5,7 @@ import { FISH_KINDS, FISH_COLORS } from './fishing.js';
 import { loadMarineModels } from './marineModels.js';
 import { createSealModel } from './sealModel.js';
 import { whalePose } from './whaleBehaviour.js';
+import { isLand } from './world.js';
 
 export function createMarineLife(parent, outerRadius, {
   modelLoader = typeof window === 'undefined' ? null : loadFishCollection,
@@ -108,13 +109,20 @@ export function createMarineLife(parent, outerRadius, {
     schools.push({ members, route: createPassage(outerRadius), start: -Math.random() * 18 });
   }
   const seal = createSealModel(clipAtBoundary);
+  function visitorPassage(lane) {
+    const route = createPassage(outerRadius, Math.random, lane);
+    // Large visitors use an open lane instead of breaching through the new land.
+    const crossesLand = Array.from({ length: 19 }, (_, i) => passagePoint(route, i / 18))
+      .some(p => isLand(p.x, p.z, -3));
+    return crossesLand ? { ...route, angle: 0, offset: -Math.abs(lane) } : route;
+  }
   const visitors = [
     { ...cetacean(false), lane: outerRadius * 0.868, duration: 34, start: -14, depth: -1.1, kind: 'whale', breach: true },
     { ...cetacean(true), lane: outerRadius * 0.78, duration: 26, start: -3, depth: -0.6, kind: 'dolphin' },
     { ...octopus(), lane: outerRadius * 0.722, duration: 32, start: -10, depth: -0.9, kind: 'octopus' },
     { ...seal, tail: null, arms: [], lane: outerRadius * 0.81, duration: 31, start: -9, depth: -0.43, kind: 'seal' },
   ];
-  visitors.forEach((view) => { view.root.name = `visitor:${view.kind}`; view.root.rotation.order = 'YXZ'; view.route = createPassage(outerRadius, Math.random, view.lane); group.add(view.root); });
+  visitors.forEach((view) => { view.root.name = `visitor:${view.kind}`; view.root.rotation.order = 'YXZ'; view.route = visitorPassage(view.lane); group.add(view.root); });
   if (marineModelLoader) Promise.resolve().then(() => marineModelLoader(clipAtBoundary)).then(template => {
     if (disposed) { template.dispose(); return; }
     marineTemplate = template;
@@ -157,6 +165,7 @@ export function createMarineLife(parent, outerRadius, {
           if (!member.root.visible) continue;
           const sway = reduceMotion ? 0 : Math.sin(time * 0.9 + member.along) * 0.16;
           const p = passagePoint(school.route, progress, member.along, member.across + sway);
+          member.root.visible = !isLand(p.x, p.z, -0.4);
           member.root.position.set(p.x, member.depth + Math.sin(time * 1.5 + member.along) * 0.06, p.z);
           member.root.rotation.y = p.heading + (reduceMotion ? 0 : Math.cos(time * 0.9 + member.along) * 0.035);
           member.root.rotation.z = reduceMotion ? 0 : Math.sin(time * 1.5 + member.along) * 0.035;
@@ -167,13 +176,15 @@ export function createMarineLife(parent, outerRadius, {
       for (const visitor of visitors) {
         let progress = (time - visitor.start) / visitor.duration;
         if (progress > 1.1) {
-          visitor.start = time + 4 + Math.random() * 10; visitor.route = createPassage(outerRadius, Math.random, visitor.lane);
+          visitor.start = time + 4 + Math.random() * 10; visitor.route = visitorPassage(visitor.lane);
           visitor.breach = visitor.kind === 'whale' && Math.random() < 0.65;
           visitor.launchSplash = visitor.landingSplash = false; progress = -1;
         }
         visitor.root.visible = progress >= 0 && progress <= 1.1;
         if (!visitor.root.visible) continue;
         const p = passagePoint(visitor.route, progress);
+        visitor.root.visible = !isLand(p.x, p.z, -2.5);
+        if (!visitor.root.visible) continue;
         const pose = whalePose(progress, visitor.duration, visitor.kind === 'whale' && visitor.breach, reduceMotion);
         visitor.root.position.set(p.x, visitor.depth + (reduceMotion ? 0 : Math.sin(time * 2) * 0.07) + pose.lift, p.z);
         visitor.root.rotation.set(pose.roll, p.heading, pose.pitch);

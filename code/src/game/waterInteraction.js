@@ -1,4 +1,4 @@
-import { ISLAND, LIGHTHOUSE } from './world.js';
+import { LIGHTHOUSE, coastRatio } from './world.js';
 
 export const RIPPLE_LIFETIME = 2.4;
 export const MAX_SPLASHES = 8;
@@ -6,7 +6,7 @@ export const MAX_SPLASHES = 8;
 export function isOpenWater(x, z, radius) {
   return Number.isFinite(x) && Number.isFinite(z) && Math.hypot(x, z) < radius - 0.2 &&
     Math.hypot(x - LIGHTHOUSE.x, z - LIGHTHOUSE.z) > LIGHTHOUSE.radius &&
-    (x / (ISLAND.x * 1.06)) ** 2 + (z / (ISLAND.z * 1.06)) ** 2 > 1;
+    coastRatio(x, z) > 1.06;
 }
 
 export function rippleHeight(x, z, time, splashes) {

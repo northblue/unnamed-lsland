@@ -1,4 +1,4 @@
-import { ISLAND, OCEAN_RADIUS } from './world.js';
+import { OCEAN_RADIUS, coastRatio } from './world.js';
 import { isOpenWater } from './waterInteraction.js';
 
 export const FISH_KINDS = ['gold', 'blue', 'coral', 'silver'];
@@ -7,7 +7,7 @@ export const HOOK_RADIUS = 3.4;
 export const CAST_RANGE = 13;
 export const WAIT_LIMIT = 25;
 export function emptyCatch() { return Object.fromEntries(FISH_KINDS.map((kind) => [kind, 0])); }
-export function isNearShore(player) { return Math.hypot(player.x / ISLAND.x, player.z / ISLAND.z) >= 0.72; }
+export function isNearShore(player) { return coastRatio(player.x, player.z) >= 0.72; }
 export function castError(player, point) {
   if (!isNearShore(player)) return 'shore';
   if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.z) || !isOpenWater(point.x, point.z, OCEAN_RADIUS)) return 'water';

@@ -21,9 +21,10 @@ test('lighthouse lights at night, fades at dawn, and respects reduced motion', (
   lighthouse.dispose(); assert.equal(scene.children.length, 0);
 });
 
-test('lighthouse reef is outside saved buildable land and cannot receive splashes or casts', () => {
+test('lighthouse headland is outside saved buildable land and cannot receive splashes or casts', () => {
   assert.ok((LIGHTHOUSE.x / ISLAND.x) ** 2 + (LIGHTHOUSE.z / ISLAND.z) ** 2 > 1);
   assert.equal(isOpenWater(LIGHTHOUSE.x, LIGHTHOUSE.z, OCEAN_RADIUS), false);
-  assert.equal(castError({ x: -18, z: 3.5 }, LIGHTHOUSE), 'water');
-  assert.equal(isOpenWater(-26, 3.5, OCEAN_RADIUS), true);
+  assert.equal(castError({ x: -20, z: 5.5 }, LIGHTHOUSE), 'water');
+  assert.equal(isOpenWater(-26, 3.5, OCEAN_RADIUS), false);
+  assert.equal(isOpenWater(-29, 3.5, OCEAN_RADIUS), true);
 });

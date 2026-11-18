@@ -1,16 +1,17 @@
 import * as THREE from 'three';
-import { LIGHTHOUSE } from './world.js';
+import { LIGHTHOUSE, terrainHeight } from './world.js';
 
-// A fixed coastal landmark. Its reef sits beyond buildable/walkable land.
+// The landmark now stands on the new rocky headland, beyond saved building land.
 export function createLighthouse(scene) {
   const root = new THREE.Group(); root.name = 'coastal-lighthouse';
-  root.position.set(LIGHTHOUSE.x, 0, LIGHTHOUSE.z); scene.add(root);
+  const ground = terrainHeight(LIGHTHOUSE.x, LIGHTHOUSE.z);
+  root.position.set(LIGHTHOUSE.x, ground - 0.97, LIGHTHOUSE.z); scene.add(root);
   const geometries = new Set(), materials = new Set();
   function material(color, options = {}) {
     const value = new THREE.MeshStandardMaterial({ color, roughness: 0.8, ...options });
     materials.add(value); return value;
   }
-  const ivory = material('#f0e7cc'), red = material('#b65e4b'), metal = material('#456365', { roughness: 0.48 });
+  const ivory = material('#eee9d8'), metal = material('#344d63', { roughness: 0.58 });
   const stone = material('#9b9c87'), dark = material('#28454a');
   const glass = material('#b7ddd3', { transparent: true, opacity: 0.22, depthWrite: false, roughness: 0.2, side: THREE.DoubleSide });
   const lamp = material('#fff1bc', { emissive: '#ffcd75', emissiveIntensity: 0 });
@@ -19,18 +20,22 @@ export function createLighthouse(scene) {
     const view = new THREE.Mesh(geometry, mat); view.position.set(x, y, z);
     view.castShadow = view.receiveShadow = !mat.transparent; parent.add(view); return view;
   }
-  const reef = mesh(new THREE.IcosahedronGeometry(1, 2), stone, 0, -0.05, 0);
-  reef.scale.set(LIGHTHOUSE.radius, 0.85, 1.65); reef.rotation.y = 0.4;
   mesh(new THREE.CylinderGeometry(1.12, 1.35, 0.38, 32), stone, 0, 0.78, 0);
   const height = 4.7, base = 0.97;
   for (let i = 0; i < 5; i++) {
     const bottom = 0.88 - i * 0.065, top = bottom - 0.065;
-    mesh(new THREE.CylinderGeometry(top, bottom, height / 5, 32), i % 2 ? red : ivory, 0, base + height / 5 * (i + 0.5), 0);
+    mesh(new THREE.CylinderGeometry(top, bottom, height / 5, 40), ivory, 0, base + height / 5 * (i + 0.5), 0);
   }
+  mesh(new THREE.CylinderGeometry(0.9, 0.92, 0.18, 40), metal, 0, 1.05, 0);
   // Door and recessed-looking dark window surrounds face the main island.
   const details = new THREE.Group(); details.rotation.y = Math.PI / 2; root.add(details);
   mesh(new THREE.BoxGeometry(0.36, 0.66, 0.07), metal, 0, 1.3, 0.85, details);
   for (const y of [2.65, 4.3]) mesh(new THREE.BoxGeometry(0.22, 0.35, 0.07), dark, 0, y, 0.88 - (y - base) * 0.069, details);
+  for (const y of [2.65, 4.3]) {
+    const z = 0.93 - (y - base) * 0.069;
+    mesh(new THREE.BoxGeometry(0.025, 0.34, 0.03), ivory, 0, y, z, details);
+    mesh(new THREE.BoxGeometry(0.2, 0.025, 0.03), ivory, 0, y, z, details);
+  }
   mesh(new THREE.CylinderGeometry(1.02, 0.96, 0.16, 32), metal, 0, 5.73, 0);
   const railing = mesh(new THREE.TorusGeometry(0.96, 0.025, 6, 40), metal, 0, 6.05, 0); railing.rotation.x = Math.PI / 2;
   for (let i = 0; i < 12; i++) {
@@ -48,13 +53,14 @@ export function createLighthouse(scene) {
   const glow = new THREE.PointLight('#ffcf83', 0, 7, 2); glow.position.set(0, 6.22, 0); root.add(glow);
   const beacon = new THREE.Group(); beacon.position.y = 6.22; beacon.name = 'lighthouse-beacon'; root.add(beacon);
   const spot = new THREE.SpotLight('#ffe0a2', 0, 32, 0.17, 0.9, 2);
-  const target = new THREE.Object3D(); target.position.set(22, -6.34, 0); beacon.add(target, spot); spot.target = target;
+  const beamDrop = ground + 5.35, beamLength = Math.hypot(22, beamDrop);
+  const target = new THREE.Object3D(); target.position.set(22, -beamDrop, 0); beacon.add(target, spot); spot.target = target;
   const beamTime={value:0};
   const beamMaterial = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, side: THREE.FrontSide,
     uniforms: { strength: { value: 0 }, time:beamTime, density:{value:0.16} },
     vertexShader: `varying float along;varying vec3 n,v,p;
-      void main(){along=clamp(position.x/23.0,0.0,1.0);p=position;n=normalMatrix*normal;
+      void main(){along=clamp(position.x/${beamLength.toFixed(4)},0.0,1.0);p=position;n=normalMatrix*normal;
         vec4 q=modelViewMatrix*vec4(position,1.0);v=q.xyz;gl_Position=projectionMatrix*q;}`,
     fragmentShader: `uniform float strength,time,density;varying float along;varying vec3 n,v,p;
       void main(){float edge=pow(abs(dot(normalize(n),normalize(-v))),1.3);
@@ -69,10 +75,10 @@ export function createLighthouse(scene) {
   materials.add(beamMaterial);
   const beams=[];
   for(const [i,radius] of [3.9,1.9,0.62].entries()) {
-    const g=new THREE.ConeGeometry(radius,23,48,1,true);g.translate(0,-11.5,0);g.rotateZ(Math.PI/2);geometries.add(g);
+    const g=new THREE.ConeGeometry(radius,beamLength,48,1,true);g.translate(0,-beamLength/2,0);g.rotateZ(Math.PI/2);geometries.add(g);
     const m=i===0?beamMaterial:beamMaterial.clone();
     m.uniforms.strength=beamMaterial.uniforms.strength;m.uniforms.time=beamTime;m.uniforms.density.value=i===0?0.16:i===1?0.12:0.1;materials.add(m);
-    const beam=new THREE.Mesh(g,m);beam.rotation.z=-Math.atan2(6.34,22);beacon.add(beam);beams.push(beam);
+    const beam=new THREE.Mesh(g,m);beam.rotation.z=-Math.atan2(beamDrop,22);beacon.add(beam);beams.push(beam);
   }
   const haloMaterial = new THREE.ShaderMaterial({
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,

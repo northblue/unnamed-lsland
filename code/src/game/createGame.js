@@ -14,6 +14,8 @@ import { createFishingState, startCast, stepFishing, landFish, isNearShore, CAST
 import { createFishingView } from './fishingView.js';
 import { createTerrain } from './terrain.js';
 import { createLighthouse } from './lighthouse.js';
+import { createIslandLandmarks } from './islandLandmarks.js';
+import { createPets } from './petView.js';
 import { createCoastalLife } from './coastalLife.js';
 import { createExplorerModel } from './explorerModel.js';
 import { createVegetation } from './vegetation.js';
@@ -252,6 +254,8 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
   const water = createWater(scene, renderer);
   const terrain = createTerrain(scene);
   const lighthouse = createLighthouse(scene);
+  const landmarks = createIslandLandmarks(scene);
+  const pets = createPets(scene);
   const coastalLife = createCoastalLife(scene);
   const pondView = createPondView(scene);
   const drifting = createDriftwood();
@@ -416,6 +420,8 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
       clouds.update(waterTime, cycle.daylight, reduceMotion.matches, cycle.twilight);
       skyVolume.update(cycle.daylight);
       lighthouse.update(waterTime, cycle.daylight, reduceMotion.matches);
+      landmarks.update(waterTime, reduceMotion.matches);
+      pets.update(paused ? 0 : dt, construction.buildings, gathering.resources, reduceMotion.matches);
       coastalLife.update(waterTime, reduceMotion.matches);
       waterTime += dt;
       water.update(waterTime, dt);
@@ -553,6 +559,8 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     water.dispose();
     terrain.dispose();
     lighthouse.dispose();
+    landmarks.dispose();
+    pets.dispose();
     coastalLife.dispose();
     pondView.dispose();
     driftView.dispose();
