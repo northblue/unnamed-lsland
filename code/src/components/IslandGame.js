@@ -239,6 +239,7 @@ export default function IslandGame() {
         <button type="button" onClick={() => gameRef.current?.cameraCommand('top')}>{text.top}</button>
         <button type="button" onClick={() => gameRef.current?.cameraCommand('side')}>{text.side}</button>
         <button type="button" onClick={() => gameRef.current?.cameraCommand('reset')}>{text.resetView}</button>
+        <button type="button" disabled={status !== 'ready'} onClick={() => gameRef.current?.cameraCommand('surf')}>{text.surfing.station}</button>
         {['lighthouse', 'court', 'garden'].map(place => <button type="button" key={place} disabled={status !== 'ready'} onClick={() => gameRef.current?.cameraCommand(place)}>{text.landmarks[place]}</button>)}
       </div>
       <div className="camera-buttons">
@@ -268,6 +269,18 @@ export default function IslandGame() {
     <div className="gather-feedback" role="status">
       {hud.built ? <span>{text.built}</span> : hud.collected && <span key={hud.feedbackSequence}>{text.collected[hud.collected]}</span>}
     </div>
+    {status === 'ready' && <button className="recover-player" type="button" title={text.recoverHelp} disabled={!!manager || openingManager} onClick={() => gameRef.current?.recoverPlayer()}>{text.recoverPlayer}</button>}
+    {status === 'ready' && (hud.surfing?.active || hud.surfing?.nearby) && <section className="basketball-card surf-card" aria-label={text.surfing.title}>
+      <strong>{text.surfing.title}</strong><span>{text.surfing.laps.replace('{laps}', hud.surfing.laps)}</span>
+      <p>{hud.surfing.active ? text.surfing.help : text.surfing.hint}</p>
+      <div><button type="button" disabled={hud.buildingMode || ['waiting', 'caught'].includes(hud.fishing?.phase)} onClick={() => gameRef.current?.toggleSurfing()}>{hud.surfing.active ? text.surfing.finish : text.surfing.start}</button>{hud.surfing.active && <><button type="button" aria-pressed={hud.surfing.follow} onClick={() => !hud.surfing.follow && gameRef.current?.toggleSurfCamera()}>{text.surfing.follow}</button><button type="button" aria-pressed={!hud.surfing.follow} onClick={() => hud.surfing.follow && gameRef.current?.toggleSurfCamera()}>{text.surfing.overview}</button></>}</div>
+      {hud.surfing.active && hud.surfing.follow && <>
+        <p className="surf-orbit-hint">{text.surfing.orbit}</p>
+        <div><button type="button" aria-label={text.cameraActions.left} onClick={() => gameRef.current?.cameraCommand('left')}>↶</button>
+        <button type="button" onClick={() => gameRef.current?.cameraCommand('surf-front')}>{text.surfing.front}</button>
+        <button type="button" aria-label={text.cameraActions.right} onClick={() => gameRef.current?.cameraCommand('right')}>↷</button></div>
+      </>}
+    </section>}
     {status === 'ready' && hud.basketball?.visible && <section className="basketball-card" aria-label={text.basketball.title}>
       <strong>{text.basketball.title}</strong><span>{text.basketball.score.replace('{makes}', hud.basketball.makes).replace('{shots}', hud.basketball.shots)}</span>
       <p aria-live="polite">{hud.basketball.result ? text.basketball[hud.basketball.result] : hud.basketball.held ? (hud.basketball.canShoot ? text.basketball.held : text.basketball.range) : hud.basketball.flying ? text.basketball.flying : text.basketball.find}</p>

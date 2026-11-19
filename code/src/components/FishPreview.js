@@ -6,12 +6,13 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { loadFishCollection } from '../game/fishModel';
 import { loadBirdModels } from '../game/birdModel';
 import { loadMarineModels } from '../game/marineModels';
+import { createStingrayModel } from '../game/stingrayModel';
 import { createSealModel } from '../game/sealModel';
 import { createShellModel, createCrabModel } from '../game/coastalLife';
 import { createExplorerModel } from '../game/explorerModel';
 import { messages } from '../game/messages';
 
-const animals = ['coral', 'blue', 'gold', 'silver', 'bird', 'seagull', 'whale', 'dolphin', 'seal', 'shell', 'crab', 'explorer'];
+const animals = ['coral', 'blue', 'gold', 'silver', 'bird', 'seagull', 'whale', 'dolphin', 'seal', 'stingray', 'shell', 'crab', 'explorer'];
 export default function FishPreview() {
   const container = useRef(null), viewRef = useRef(null);
   const [language, setLanguage] = useState('zh');
@@ -22,7 +23,7 @@ export default function FishPreview() {
   const text = messages[language].fishPreview;
   const isExplorer = selected === 'explorer';
   const isFish = animals.slice(0,4).includes(selected);
-  const isMarine = ['whale','dolphin','seal'].includes(selected);
+  const isMarine = ['whale','dolphin','seal','stingray'].includes(selected);
   const isBird = selected === 'bird' || selected === 'seagull';
   useEffect(() => {
     try { if (localStorage.getItem('unnamed-island-language') === 'en') setLanguage('en'); } catch { /* Optional preference. */ }
@@ -61,6 +62,7 @@ export default function FishPreview() {
           if (model) {
             if (kind === 'whale') model.root.scale.setScalar(0.28);
             if (kind === 'dolphin') model.root.scale.setScalar(0.5);
+            if (kind === 'stingray') { model.root.scale.setScalar(0.55); model.root.position.x = 0.65; }
             if (kind === 'seal') model.root.scale.setScalar(0.65);
             if (kind === 'shell') model.root.scale.setScalar(1.8);
             if (kind === 'crab') model.root.scale.setScalar(1.25);
@@ -73,6 +75,10 @@ export default function FishPreview() {
     load(loadFishCollection, animals.slice(0, 4), (template, kind) => template.create(kind));
     load(loadBirdModels, ['bird', 'seagull'], (template, kind) => template.create(kind === 'seagull'));
     load(loadMarineModels, ['whale', 'dolphin'], (template, kind) => template.create(kind));
+    load(async () => {
+      const ray = createStingrayModel();
+      return { create: () => ({ root: ray.root, update: (time, options) => ray.update(time, options.reduceMotion) }), dispose: () => ray.dispose() };
+    }, ['stingray'], template => template.create());
     load(async () => {
       const seal = createSealModel();
       return { create: () => ({ root: seal.root, update: (time, options) => seal.update(time, options.reduceMotion) }), dispose: () => seal.dispose() };
@@ -136,7 +142,7 @@ export default function FishPreview() {
       </> : <span>{isMarine ? text.swimming : text.beach}</span>}
     </div>
     <div className="fish-model-stage" ref={container} aria-label={text.scene} />
-    <p role="status">{text[availability[selected] || 'loading']}</p><p>{text.note}</p>
+    <p role="status">{text[availability[selected] || 'loading']}</p><p>{selected === 'stingray' ? text.stingrayNote : text.note}</p>
     <p><a href="https://quaternius.com/packs/animatedfish.html">Quaternius · CC0</a> · <a href="https://github.com/Mesh2Motion/mesh2motion-app">Mesh2Motion · CC0</a></p>
   </main>;
 }

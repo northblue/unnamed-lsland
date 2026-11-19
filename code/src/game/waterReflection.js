@@ -10,16 +10,16 @@ export function createWaterReflection(geometry, normalMap) {
       normalMap: { value: normalMap }, time: { value: 0 }, orthographic: { value: 1 },
     },
     vertexShader: `uniform mat4 textureMatrix; varying vec4 mirrorUv;
-      varying vec2 waterUv; varying vec3 viewPosition; varying vec3 viewNormal;
-      void main(){ mirrorUv=textureMatrix*vec4(position,1.0); waterUv=uv;
+      varying vec2 waterUv; varying vec2 seaWorld; varying vec3 viewPosition; varying vec3 viewNormal;
+      void main(){ mirrorUv=textureMatrix*vec4(position,1.0); waterUv=uv;seaWorld=(modelMatrix*vec4(position,1.)).xz;
         vec4 p=modelViewMatrix*vec4(position,1.0); viewPosition=p.xyz;
         viewNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*p; }`,
     fragmentShader: `uniform sampler2D tDiffuse,normalMap; uniform vec3 color;
       uniform float time,orthographic; varying vec4 mirrorUv; varying vec2 waterUv;
-      varying vec3 viewPosition,viewNormal;
+      varying vec3 viewPosition,viewNormal;varying vec2 seaWorld;
       void main(){
         vec2 ripple=texture2D(normalMap,waterUv*3.0+vec2(time*0.006,time*0.003)).rg*2.0-1.0;
-        vec2 uv=mirrorUv.xy/mirrorUv.w+ripple*0.0012;
+        vec2 uv=mirrorUv.xy/mirrorUv.w+ripple*0.003;
         vec2 pixel=vec2(1.0/512.0);
         vec3 reflected=texture2D(tDiffuse,uv).rgb*0.4;
         reflected+=(texture2D(tDiffuse,uv+vec2(pixel.x,0.0)).rgb+texture2D(tDiffuse,uv-vec2(pixel.x,0.0)).rgb
@@ -27,8 +27,12 @@ export function createWaterReflection(geometry, normalMap) {
         vec3 eye=normalize(mix(-viewPosition,vec3(0.0,0.0,1.0),orthographic));
         float facing=clamp(dot(normalize(viewNormal),eye),0.0,1.0);
         float fresnel=0.02+0.45*pow(1.0-facing,5.0);
-        float alpha=0.16+fresnel*0.84;
-        gl_FragColor=vec4(mix(color,reflected,fresnel/alpha),alpha);
+        float depth=clamp((length(seaWorld)-17.)/25.,0.,1.);
+        vec3 tint=color*mix(vec3(1.22,1.35,1.1),vec3(.43,.8,.86),depth);
+        float caustic=pow(max(0.,sin(seaWorld.x*2.7+sin(seaWorld.y*1.8+time*.25))*sin(seaWorld.y*2.3-time*.3)),12.);
+        tint+=vec3(.08,.13,.1)*caustic*(1.-depth)*.28;
+        float alpha=0.34+depth*.15+fresnel*.45;
+        gl_FragColor=vec4(mix(tint,reflected,fresnel/alpha),alpha);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }`,
@@ -39,7 +43,7 @@ export function createWaterReflection(geometry, normalMap) {
   const mirrorRender = surface.onBeforeRender;
   const reflectionSky = new THREE.Color('#bdd8dc');
   const daySky = reflectionSky.clone(), nightSky = new THREE.Color('#102a40');
-  const tintDay = new THREE.Color('#2d9fab'), tintNight = new THREE.Color('#123c52');
+  const tintDay = new THREE.Color('#168e96'), tintNight = new THREE.Color('#123c52');
   surface.onBeforeRender = function(renderer, scene, camera) {
     surface.material.uniforms.orthographic.value = camera.isOrthographicCamera ? 1 : 0;
     const hidden = [];

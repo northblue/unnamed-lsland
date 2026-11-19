@@ -224,3 +224,7 @@ footer { position: absolute; bottom: 23px; left: 42px; right: 42px; display: fle
   .game-shell .camera-panel { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 56px); }
   .game-shell .build-card { bottom: calc(max(14px, env(safe-area-inset-bottom)) + 112px); }
 }
+
+.surf-card button[aria-pressed="true"] { background: #365f50; color: #fffdf1; }
+
+.recover-player { position:absolute;z-index:9;left:max(20px,env(safe-area-inset-left));bottom:max(54px,calc(env(safe-area-inset-bottom) + 54px));min-height:44px;padding:8px 12px;border:1px solid #8ba28e;border-radius:10px;background:#fffdf1ed;color:#365f50;cursor:pointer;font-size:12px; }

@@ -1,5 +1,5 @@
 export const ISLAND = { x: 20, z: 15.5 };
-export const OCEAN_RADIUS = 33;
+export const OCEAN_RADIUS = 43;
 export const LIGHTHOUSE = { x: -22.3, z: 3.5, radius: 4.5 };
 export const GARDEN = { x: 10, z: 17, rx: 8.8, rz: 8.8 };
 export const COURT = { x: 10.5, z: 19.2, halfX: 4, halfZ: 3.8, y: 1.02, hoopZ: 14.7 };
@@ -99,6 +99,12 @@ export function canWalk(x, z, buildings = [], obstacles = OBSTACLES) {
 
 // Resolve each ground axis separately so the player slides along obstacles.
 export function movePlayer(position, dx, dz, buildings = [], obstacles = OBSTACLES) {
+  const startX=position.x,startZ=position.z;
   if (canWalk(position.x + dx, position.z, buildings, obstacles)) position.x += dx;
   if (canWalk(position.x, position.z + dz, buildings, obstacles)) position.z += dz;
+  // Narrow diagonal gaps can block both separate axes even when the desired path is clear.
+  if(position.x===startX&&position.z===startZ&&dx&&dz) {
+    const steps=Math.ceil(Math.hypot(dx,dz)/.04);
+    if(Array.from({length:steps+1},(_,i)=>i/steps).every(t=>canWalk(startX+dx*t,startZ+dz*t,buildings,obstacles))) { position.x+=dx;position.z+=dz; }
+  }
 }

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { SKY_VOLUME } from './skyVolume.js';
 
-// Camera-facing wisps: one draw per cloud, no hard sphere surfaces or external texture.
+// Soft, slightly fuller camera-facing puffs: one draw per cloud, no hard sphere surfaces or external texture.
 export function createClouds(scene) {
   const root=new THREE.Group();root.name='sea-breeze-clouds';root.userData.skipWaterReflection=true;scene.add(root);
   const positions=[],corners=[],sizes=[],seeds=[];
@@ -21,7 +21,7 @@ export function createClouds(scene) {
       void main(){puffUv=corner;puffSeed=seed;
         vec4 p=modelViewMatrix*vec4(position,1.0);
         float scale=length(modelMatrix[0].xyz);
-        vec3 viewOffset=vec3(corner.x*puffSize*scale,corner.y*puffSize*scale*0.68,0.0);
+        vec3 viewOffset=vec3(corner.x*puffSize*scale,corner.y*puffSize*scale*0.78,0.0);
         p.xyz+=viewOffset;
         skyWorld=(modelMatrix*vec4(position,1.0)).xyz+(vec4(viewOffset,0.0)*viewMatrix).xyz;
         gl_Position=projectionMatrix*p;}`,
@@ -32,12 +32,13 @@ export function createClouds(scene) {
         return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),f.x),f.y);}
       void main(){
         vec2 uv=puffUv;float n=noise(uv*3.4+vec2(puffSeed+time*0.025,0.0))*0.6+noise(uv*7.0+puffSeed-time*0.018)*0.4;
-        float density=pow(max(0.0,1.0-dot(uv,uv)),1.7)*smoothstep(0.05,0.75,n);
+        float density=pow(max(0.0,1.0-dot(uv,uv)),1.25)*mix(0.68,1.0,smoothstep(0.05,0.75,n));
         float boundary=1.0-smoothstep(sphere.x-sphere.z,sphere.x,length(skyWorld-vec3(0.0,sphere.y,0.0)));
-        float light=smoothstep(-1.0,0.9,uv.y)*0.13;
-        vec3 color=mix(vec3(0.35,0.43,0.62),vec3(0.88,0.93,0.94)+light,daylight);
+        float light=smoothstep(-0.8,0.8,uv.y)*0.12;
+        float core=sqrt(max(0.0,1.0-dot(uv,uv)));
+        vec3 color=mix(vec3(0.35,0.43,0.62),mix(vec3(0.72,0.79,0.84),vec3(0.94,0.97,0.98),core*0.65+light*2.0),daylight);
         color=mix(color,vec3(1.0,0.78,0.65),twilight*0.3);
-        float alpha=density*boundary*(0.38+daylight*0.12);
+        float alpha=density*boundary*(0.48+daylight*0.16);
         if(alpha<0.002)discard;gl_FragColor=vec4(color,alpha);
         #include <colorspace_fragment>
       }`,

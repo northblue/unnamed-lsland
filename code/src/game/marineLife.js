@@ -3,6 +3,7 @@ import { createPassage, passagePoint } from './marineRoutes.js';
 import { loadFishCollection } from './fishModel.js';
 import { FISH_KINDS, FISH_COLORS } from './fishing.js';
 import { loadMarineModels } from './marineModels.js';
+import { createStingrayModel } from './stingrayModel.js';
 import { createSealModel } from './sealModel.js';
 import { whalePose } from './whaleBehaviour.js';
 import { whaleBreath, createWhaleSpout } from './whaleSpout.js';
@@ -134,6 +135,7 @@ export function createMarineLife(parent, outerRadius, {
     schools.push({ members, route: createPassage(outerRadius), start: -Math.random() * 18 });
   }
   const seal = createSealModel(clipAtBoundary);
+  const stingray = createStingrayModel(clipAtBoundary);
   function visitorPassage(lane) {
     const route = createPassage(outerRadius, Math.random, lane);
     // Large visitors use an open lane instead of breaching through the new land.
@@ -142,6 +144,7 @@ export function createMarineLife(parent, outerRadius, {
     return crossesLand ? { ...route, angle: 0, offset: -Math.abs(lane) } : route;
   }
   const visitors = [
+    { ...stingray, tail: null, arms: [], lane: outerRadius * 0.75, duration: 58, start: -24, depth: -1.12, kind: 'stingray' },
     { ...cetacean(false), lane: outerRadius * 0.868, duration: 34, start: -14, depth: -1.1, kind: 'whale', breach: true },
     { ...cetacean(true), lane: outerRadius * 0.78, duration: 26, start: -3, depth: -0.6, kind: 'dolphin' },
     { ...octopus(), lane: outerRadius * 0.722, duration: 48, start: -10, depth: -0.85, kind: 'octopus' },
@@ -226,6 +229,7 @@ export function createMarineLife(parent, outerRadius, {
         visitor.swimTime = (visitor.swimTime ?? 0) + (reduceMotion ? 0 : swimDt * (pose.active ? 1.5 : 0.85));
         visitor.imported?.update(reduceMotion ? 0 : visitor.swimTime);
         if (visitor.kind === 'seal') seal.update(time, reduceMotion);
+        if (visitor.kind === 'stingray') stingray.update(time, reduceMotion);
         if (visitor.breach && !reduceMotion && pose.u >= 0 && pose.u < 1.2) {
           if (!visitor.launchSplash && pose.u >= 0.05) { onSplash(p.x, p.z, 1.4); visitor.launchSplash = true; }
           if (!visitor.landingSplash && pose.u >= 0.92) { onSplash(p.x, p.z, 2.2); visitor.landingSplash = true; }
@@ -237,7 +241,7 @@ export function createMarineLife(parent, outerRadius, {
     dispose() {
       disposed = true;
       importedViews.forEach(view => view.dispose()); importedTemplate?.dispose();
-      marineTemplate?.dispose(); seal.dispose(); spout.dispose(); extraGeometry.forEach(g => g.dispose());
+      marineTemplate?.dispose(); seal.dispose(); stingray.dispose(); spout.dispose(); extraGeometry.forEach(g => g.dispose());
       group.removeFromParent(); sphere.dispose(); cone.dispose();
       materials.forEach((value) => value.dispose());
     },

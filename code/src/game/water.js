@@ -48,7 +48,7 @@ export function createWater(scene, renderer) {
   normalMap.needsUpdate = true;
 
   const sideMaterial = new THREE.MeshPhysicalMaterial({
-    color: '#4ba8b4', transmission: 0, transparent: true, opacity: 0.36,
+    color: '#128b91', transmission: 0, transparent: true, opacity: 0.54,
     depthWrite: false, roughness: 0.28, metalness: 0, clearcoat: 0.08,
   });
   const reflection = createWaterReflection(new THREE.RingGeometry(0, RADIUS, 128, 24), normalMap);
@@ -81,8 +81,8 @@ export function createWater(scene, renderer) {
   const positions = [];
   const colors = [];
   const indices = [];
-  const shallow = new THREE.Color('#f0dfb9');
-  const deep = new THREE.Color('#498f9d');
+  const shallow = new THREE.Color('#b4cfb5');
+  const deep = new THREE.Color('#216a75');
   const color = new THREE.Color();
   function shelfPoint(angle, t) {
     return {
