@@ -1,7 +1,7 @@
 {
-  "sourceCommit": "2b354eab07a9249b4adb8dd7e19bd531911f61d5",
+  "sourceCommit": "c39ee176decb7dea191bd3be9d9ae80db02e5ddb",
   "platform": "linux/amd64",
-  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/44513412779",
+  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/44534766435",
   "trigger": "push",
   "lanOriginSupported": true,
   "sharedPasswordSupported": true,
@@ -13,22 +13,21 @@
   "nasDeployed": true,
   "anonymousPullVerified": true,
   "web": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:eff33032156a65859a94ed958851d30ed907ab9643904184da6f7aa28f2f1009"
+    "tag": "ghcr.io/northblue/unnamed-island:sha-c39ee176decb7dea191bd3be9d9ae80db02e5ddb",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:b52c7fff72c74d324374c60dac9560ca76a8cce863a6dc3418ce3d1080bcba3b"
   },
   "tools": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5-tools",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:9386c9969b491a258369a38fb27a9791c1d806b40d7b68b1b7a19081ed99bee1"
+    "tag": "ghcr.io/northblue/unnamed-island:sha-c39ee176decb7dea191bd3be9d9ae80db02e5ddb-tools",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:a846e1c64be331a6380dd8982e502a641be9ef98b07c974eea7adb563305e77a"
   },
   "updater": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5-updater",
+    "tag": "ghcr.io/northblue/unnamed-island:sha-c39ee176decb7dea191bd3be9d9ae80db02e5ddb-updater",
     "image": "ghcr.io/northblue/unnamed-island@sha256:b18268cbf7c42a6006c68839a1e9b2a7e9ee53b78697b7297caabc53358f3938"
   },
-  "nasDeploymentVerification": "Public frontend build and recovery/surf-camera assets; no authenticated gameplay or running-container digest inspection",
+  "nasDeploymentVerification": "Public frontend build changed after this verified release; no authenticated NAS gameplay or running-container digest inspection",
   "nasFrontendVerification": {
-    "buildId": "8CkawguhrZGCJJvzjeO87",
-    "recoveryAssetsVerified": true,
-    "surfCameraAssetsVerified": true,
+    "buildId": "GBWw21z70oE63_7uYgHt1",
+    "publicAssetsVerified": true,
     "runningContainerDigestVerified": false
   }
 }

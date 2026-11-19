@@ -1,0 +1,34 @@
+{
+  "sourceCommit": "2b354eab07a9249b4adb8dd7e19bd531911f61d5",
+  "platform": "linux/amd64",
+  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/44513412779",
+  "trigger": "push",
+  "lanOriginSupported": true,
+  "sharedPasswordSupported": true,
+  "mobileFocusSupported": true,
+  "autoUpdateSupported": true,
+  "storageContract": "62b45b60feaffe634df4f1051bb036a10342055033209cecb6dfd3e66dcff2c6",
+  "nasChannel": "ghcr.io/northblue/unnamed-island:nas-stable",
+  "publicOrigin": "https://unnamed-island.northblue.cc",
+  "nasDeployed": true,
+  "anonymousPullVerified": true,
+  "web": {
+    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:eff33032156a65859a94ed958851d30ed907ab9643904184da6f7aa28f2f1009"
+  },
+  "tools": {
+    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5-tools",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:9386c9969b491a258369a38fb27a9791c1d806b40d7b68b1b7a19081ed99bee1"
+  },
+  "updater": {
+    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5-updater",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:b18268cbf7c42a6006c68839a1e9b2a7e9ee53b78697b7297caabc53358f3938"
+  },
+  "nasDeploymentVerification": "Public frontend build and recovery/surf-camera assets; no authenticated gameplay or running-container digest inspection",
+  "nasFrontendVerification": {
+    "buildId": "8CkawguhrZGCJJvzjeO87",
+    "recoveryAssetsVerified": true,
+    "surfCameraAssetsVerified": true,
+    "runningContainerDigestVerified": false
+  }
+}
