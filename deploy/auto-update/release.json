@@ -1,7 +1,7 @@
 {
-  "sourceCommit": "b90a03f66a01663e1c2989c821cde33a356c2cb7",
+  "sourceCommit": "2b354eab07a9249b4adb8dd7e19bd531911f61d5",
   "platform": "linux/amd64",
-  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/44360383416",
+  "workflowRun": "https://github.com/northblue/unnamed-lsland/actions/runs/44513412779",
   "trigger": "push",
   "lanOriginSupported": true,
   "sharedPasswordSupported": true,
@@ -13,21 +13,22 @@
   "nasDeployed": true,
   "anonymousPullVerified": true,
   "web": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-b90a03f66a01663e1c2989c821cde33a356c2cb7",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:142e82e79ffe2f07bb37ac6c58b2eb2dc63aa28845d9d89782478674c34d1118"
+    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:eff33032156a65859a94ed958851d30ed907ab9643904184da6f7aa28f2f1009"
   },
   "tools": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-b90a03f66a01663e1c2989c821cde33a356c2cb7-tools",
-    "image": "ghcr.io/northblue/unnamed-island@sha256:925f7e1cd777e9a69bc3e012de04d112dd1b1cd38db3e6cfc2c224cfb75bf169"
+    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5-tools",
+    "image": "ghcr.io/northblue/unnamed-island@sha256:9386c9969b491a258369a38fb27a9791c1d806b40d7b68b1b7a19081ed99bee1"
   },
   "updater": {
-    "tag": "ghcr.io/northblue/unnamed-island:sha-b90a03f66a01663e1c2989c821cde33a356c2cb7-updater",
+    "tag": "ghcr.io/northblue/unnamed-island:sha-2b354eab07a9249b4adb8dd7e19bd531911f61d5-updater",
     "image": "ghcr.io/northblue/unnamed-island@sha256:b18268cbf7c42a6006c68839a1e9b2a7e9ee53b78697b7297caabc53358f3938"
   },
-  "nasDeploymentVerification": "public frontend build and basketball assets; no authenticated gameplay or running-container digest inspection",
+  "nasDeploymentVerification": "Public frontend build and recovery/surf-camera assets; no authenticated gameplay or running-container digest inspection",
   "nasFrontendVerification": {
-    "buildId": "9_E9wskTjLvIV2Lv2T7Nr",
-    "basketballAssetsVerified": true,
+    "buildId": "8CkawguhrZGCJJvzjeO87",
+    "recoveryAssetsVerified": true,
+    "surfCameraAssetsVerified": true,
     "runningContainerDigestVerified": false
   }
 }
