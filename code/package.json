@@ -24,6 +24,7 @@
   "type": "module",
   "private": true,
   "dependencies": {
+    "@dimforge/rapier3d-compat": "0.21.0",
     "@opennextjs/cloudflare": "^1.20.16",
     "@prisma/adapter-d1": "^7.10.1",
     "@prisma/adapter-pg": "7.10.1",

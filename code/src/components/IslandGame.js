@@ -88,9 +88,11 @@ export default function IslandGame() {
   useEffect(() => {
     let disposed = false;
     let game;
-    Promise.all([import('../game/createGame'), offline ? Promise.resolve(createIslandState()) : storage.load()]).then(([{ createGame }, initialState]) => {
+    Promise.all([import('../game/createGame'), offline ? Promise.resolve(createIslandState()) : storage.load()]).then(async ([{ createGame, initIslandPhysics }, initialState]) => {
       if (disposed) return;
       try {
+        await initIslandPhysics();
+        if (disposed) return;
         game = createGame(container.current, setHud, initialState, (snapshot) => { if (!offline) storage.save(snapshot).catch(() => {}); });
         gameRef.current = game;
         setAmbientEnabled(false);

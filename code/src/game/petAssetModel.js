@@ -35,12 +35,18 @@ export function preparePetAsset(gltf, kind) {
     }
     const face = model.getObjectByName('head'), paw = model.getObjectByName('front_leg_upper_l'), gesture = new THREE.Quaternion(), axis = new THREE.Vector3(0, 0, 1);
     const faceBase = face.quaternion.clone(), pawBase = paw.quaternion.clone();
-    let previous, active;
+    let previous, active, candidate, candidateFor=0;
     const instance = { root, update(time, { moving = false, resting = false, playful = false, interaction = 'none', reduceMotion = false, motionTime = time } = {}) {
       face.quaternion.copy(faceBase); paw.quaternion.copy(pawBase);
       const dt = previous === undefined ? 0 : Math.max(0, Math.min(0.1, motionTime - previous)); previous = motionTime;
-      const target = reduceMotion ? 'Idle' : resting ? variant % 2 ? 'Sit' : 'Sleep' : moving ? playful ? 'Run' : 'Walk' : playful ? 'Play Bow' : 'Idle';
-      if (active !== target) { actions[target]?.reset().play(); active = target; }
+      const requested = reduceMotion ? 'Idle' : resting ? variant % 2 ? 'Sit' : 'Sleep' : moving ? playful ? 'Run' : 'Walk' : playful ? 'Play Bow' : 'Idle';
+      if(candidate!==requested){candidate=requested;candidateFor=0;}else candidateFor+=dt;
+      const target=active===undefined||reduceMotion||candidateFor>=.22?requested:active;
+      if (active !== target) {
+        // Keep locomotion phase running through small speed changes; reset only one-shot poses.
+        if(target==='Sleep'||target==='Sit')actions[target]?.reset();
+        actions[target]?.play();active=target;
+      }
       const blend = (dt === 0 && Object.values(weights).every(w => w === 0)) || reduceMotion ? 1 : 1 - Math.exp(-dt * 7);
       for (const [name, action] of Object.entries(actions)) {
         weights[name] = THREE.MathUtils.lerp(weights[name], name === target ? 1 : 0, blend); action.setEffectiveWeight(weights[name]);

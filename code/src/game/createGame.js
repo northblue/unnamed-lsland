@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import { ISLAND, SPAWN, movePlayer, terrainHeight, activeObstacles, SCENERY_TREES } from './world';
+import { ISLAND, SPAWN, terrainHeight, activeObstacles, SCENERY_TREES } from './world';
 import { buildHut, HUT, placementError, findBuildSpot, hutMaterialsMissing } from './building.js';
+import { createIslandPhysics } from './islandPhysics.js';
+export { initIslandPhysics } from './islandPhysics.js';
 import { isPlayerTrapped, safeRecoveryPosition } from './playerRecovery.js';
 import { createCameraControls } from './cameraControls.js';
 import { createBuildSelection } from './buildSelection.js';
@@ -180,7 +182,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     if(surfing.active){Object.assign(surfing,createSurfState());cameraControls.setSurfFollow(false);}
     if(basketball.phase==='held')toggleBall(basketball,player.position);
     cancelFishing();Object.assign(jump,createJumpState());setBuilding(false);clear();
-    player.position.set(point.x,terrainHeight(point.x,point.z),point.z);cameraControls.command('reset');
+    player.position.set(point.x,terrainHeight(point.x,point.z),point.z);physics.place('player',player.position);cameraControls.command('reset');
     nextSnapshotAt=0;container.focus({preventScroll:true});return true;
   }
   function toggleSurfing() {
@@ -312,7 +314,8 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
   const lighthouse = createLighthouse(scene);
   const landmarks = createIslandLandmarks(scene);
   const surfView = createSurfView(scene), orbitWaves = createOrbitWaves(scene);
-  const pets = createPets(scene);
+  const physics = createIslandPhysics();
+  const pets = createPets(scene,{physics});
   const coastalLife = createCoastalLife(scene);
   const pondView = createPondView(scene);
   const drifting = createDriftwood();
@@ -374,6 +377,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
   const player = playerModel.root;
   player.position.set(SPAWN.x, 0.52, SPAWN.z);
   scene.add(player);
+  physics.addActor('player','player',player.position);
 
   function getSnapshot() {
     return { version: 1, name: islandName, wood: gathering.wood, stone: gathering.stone, catches: { ...catches }, pond: { ...pond },
@@ -411,6 +415,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     const recovered=trapped?safeRecoveryPosition(construction.buildings,activeObstacles(gathering.resources)):null;
     const restored=recovered??state.player;
     player.position.set(restored.x,terrainHeight(restored.x,restored.z),restored.z);
+    physics.syncStatics(construction.buildings,activeObstacles(gathering.resources));physics.place('player',player.position);
     Object.assign(jump, createJumpState());
     setBuilding(false);
     lastSnapshotSignature = JSON.stringify(recovered ? state : getSnapshot());
@@ -493,7 +498,9 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
       skyVolume.update(cycle.daylight);
       lighthouse.update(waterTime, cycle.daylight, reduceMotion.matches);
       landmarks.update(waterTime, reduceMotion.matches, cycle, dt);
-      pets.update(paused ? 0 : dt, construction.buildings, gathering.resources, reduceMotion.matches);
+      physics.syncStatics(construction.buildings,activeObstacles(gathering.resources));
+      physics.place('player',player.position,!surfing.active);
+      pets.update(paused ? 0 : dt, construction.buildings, gathering.resources, reduceMotion.matches, surfing.active?null:player.position);
       coastalLife.update(waterTime, reduceMotion.matches);
       waterTime += dt; if (!paused) swellTime += dt;
       water.update(waterTime, dt);
@@ -533,10 +540,11 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
       const z = Number(keys.has('KeyW') || keys.has('ArrowUp')) - Number(keys.has('KeyS') || keys.has('ArrowDown'));
       const length = Math.hypot(x, z);
       const walking = length && !surfing.active && !buildingMode && !paused && !['waiting', 'caught'].includes(fishing.phase);
+      let desiredX=0,desiredZ=0;
       if (walking) {
         const dx = (right.x * x + forward.x * z) / length;
         const dz = (right.z * x + forward.z * z) / length;
-        movePlayer(player.position, dx * dt * 4, dz * dt * 4, construction.buildings, activeObstacles(gathering.resources));
+        desiredX=dx*dt*4;desiredZ=dz*dt*4;
         player.rotation.y = Math.atan2(-dx, -dz);
         elapsed += dt;
       }
@@ -545,10 +553,14 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
         stepSurf(surfing, paused ? 0 : dt, { steer: x, throttle: z, waveTime: swellTime });
         player.position.set(surfing.position.x, water.surfaceHeight(surfing.position.x, surfing.position.z) + 0.32 + (reduceMotion.matches ? 0 : surfWaveHeight(surfing.angle, swellTime, surfing.lane)), surfing.position.z);
         player.rotation.y = surfing.heading; cameraControls.follow(player.position, surfing.heading, dt);
-      } else player.position.y = terrainHeight(player.position.x, player.position.z) + jump.height
-        + (walking && jump.grounded && !reduceMotion.matches ? Math.sin(elapsed * 16) * 0.035 : 0);
+      } else if(!paused) {
+        const next=physics.move('player',player.position,desiredX,desiredZ,{height:jump.height});
+        const moved=Math.hypot(next.x-player.position.x,next.z-player.position.z)>.0001;
+        player.position.set(next.x,next.y,next.z);
+        if(!moved){desiredX=desiredZ=0;}
+      }
       surfView.update(surfing, swellTime, water.surfaceHeight, reduceMotion.matches);
-      playerModel.update(waterTime,{moving:Boolean(walking),surfing:surfing.active,surfLean:surfing.lean,jumping:!jump.grounded,carrying:basketball.phase==='held',shooting:basketball.time<basketball.releaseUntil,fishing:fishing.phase!=='idle',reduceMotion:reduceMotion.matches});
+      playerModel.update(waterTime,{moving:Boolean(desiredX||desiredZ),surfing:surfing.active,surfLean:surfing.lean,jumping:!jump.grounded,carrying:basketball.phase==='held',shooting:basketball.time<basketball.releaseUntil,fishing:fishing.phase!=='idle',reduceMotion:reduceMotion.matches});
       stepBasketball(basketball, paused ? 0 : dt, player.position, { heading: player.rotation.y, moving: Boolean(walking), airborne: !jump.grounded });
       landmarks.ball.position.set(basketball.ball.x, basketball.ball.y, basketball.ball.z);
       if (!paused && basketball.phase !== 'ground' && !reduceMotion.matches) landmarks.ball.rotation.z += dt * 4;
@@ -648,7 +660,7 @@ export function createGame(container, onHudChange = () => {}, initialState = cre
     terrain.dispose();
     lighthouse.dispose();
     landmarks.dispose(); surfView.dispose(); orbitWaves.dispose();
-    pets.dispose();
+    pets.dispose();physics.dispose();
     coastalLife.dispose();
     pondView.dispose();
     driftView.dispose();

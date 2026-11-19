@@ -76,3 +76,15 @@ test('individual moods allow solitude, mixed species groups and asynchronous inv
   }
   assert.ok(solo && group && sameSpecies && mixedMoods);
 });
+
+test('pets limit turn rate and tolerate obstacles without instantaneous direction reversals',()=>{
+ let seed=19;const state=createPetState({random:()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296)});
+ for(let i=0;i<4000;i++){
+   const before=state.pets.map(p=>({x:p.x,z:p.z,heading:p.heading}));stepPets(state,1/60);
+   state.pets.forEach((p,j)=>{
+     const angle=Math.atan2(Math.sin(p.heading-before[j].heading),Math.cos(p.heading-before[j].heading));
+     assert.ok(Math.abs(angle)<=3/60+1e-9);
+     assert.ok(Math.hypot(p.x-before[j].x,p.z-before[j].z)<.04);
+   });
+ }
+});

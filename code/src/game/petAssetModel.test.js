@@ -42,3 +42,13 @@ test('late pet assets are disposed after scene teardown instead of reattaching',
   await Promise.resolve(); pets.dispose(); resolve({ dispose() { disposed++; } });
   await new Promise(setImmediate); assert.equal(disposed, 1); assert.equal(scene.children.length, 0);
 });
+
+test('brief stop/start noise does not snap the articulated pet animation',async()=>{
+ const template=preparePetAsset(await load('dog'),'dog'),pet=template.create();
+ const leg=pet.root.getObjectByName('front_leg_upper_l');let previous=leg.quaternion.clone();
+ for(let frame=0;frame<240;frame++){
+   pet.update(frame/60,{motionTime:frame/60,moving:frame<90||frame>150||frame%2===0,playful:frame>170});
+   const current=leg.quaternion.clone().normalize();assert.ok(previous.angleTo(current)<.5);previous=current;
+ }
+ pet.dispose();template.dispose();
+});
